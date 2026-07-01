@@ -1957,7 +1957,7 @@ def render_marketing_console() -> str:
         "",
         notes.length ? "Review notes:" : "",
         ...notes.map((note) => `- ${note}`)
-      ].filter(Boolean).join("\n");
+      ].filter(Boolean).join("\\n");
     }
 
     function leadPayload() {

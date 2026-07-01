@@ -1,4 +1,7 @@
 import sys
+import re
+import shutil
+import subprocess
 import tempfile
 import unittest
 from pathlib import Path
@@ -35,6 +38,25 @@ class UiAndStorageTests(unittest.TestCase):
         self.assertIn("Deutsch (Deutschland)", html)
         self.assertIn("AI draft language", html)
         self.assertIn("content_id", html)
+
+    def test_marketing_console_script_is_parseable_when_node_is_available(self):
+        if not shutil.which("node"):
+            self.skipTest("node is not available")
+
+        html = render_marketing_console()
+        script_match = re.search(r"<script>(.*?)</script>", html, re.S)
+        self.assertIsNotNone(script_match)
+        script = script_match.group(1)
+
+        result = subprocess.run(
+            ["node", "--check"],
+            input=script,
+            text=True,
+            capture_output=True,
+            check=False,
+        )
+
+        self.assertEqual(result.returncode, 0, result.stderr)
 
     def test_store_lists_recent_states_without_full_payload(self):
         with tempfile.TemporaryDirectory() as tmp:
