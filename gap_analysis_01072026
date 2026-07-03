@@ -1,0 +1,57 @@
+# Gap-Analyse: WAMOCON Marketingmaschine
+
+Diese Analyse vergleicht die in der `Master-Strategie-WAMOCON-v2.0.md` definierte Vision einer vollautomatisierten "ultimativen Marketingmaschine" mit dem aktuellen IST-Zustand der Codebasis und Workflows (`end-user-workflow.md`, `operations-runbook.md`, `src/`-Verzeichnis).
+
+## 📊 Zusammenfassung des Gaps
+
+Aktuell ist das System eine **halbmanuelle Assistenz-Plattform** (Content Intake, Freigabe-Pipelines via n8n). Die Vision der Master-Strategie zielt jedoch auf ein **autonom agierendes Multi-Agenten-System** (14 spezialisierte Bots) ab, das selbstständig recherchiert, plant und Content entwirft. 
+
+Der Weg zur "ultimativen Marketingmaschine" (Marktanalyse bis Posting-Vorbereitung) erfordert den Übergang von manuellen UI-Eingaben zur automatisierten Orchestrierung.
+
+---
+
+## 🟢 Was bereits umgesetzt ist (IST-Zustand)
+
+1. **Strategische Fundamente (Datenstruktur)**
+   - Die Kampagnen (K1-K5) und Zielgruppen (Z1-Z5) existieren als strukturierte JSON-Dateien.
+   - Die `bot_architektur.json` enthält die detaillierten Prompts und Rollendefinitionen für alle 14 Bots.
+2. **Content-Generierung (Manuell angestoßen)**
+   - Ein funktionierendes UI (`http://192.168.178.75:18117/ui`) erlaubt die Auswahl von Kampagne/Zielgruppe und generiert daraus einen Content-Entwurf.
+   - `content_generator.py` und n8n-Pipelines (`WAMOCON Marketing - Manual Content Intake`) übernehmen die Formatierung.
+3. **Qualitätssicherung & Freigabe**
+   - Die `WAMOCON Marketing - Human Approval`-Pipeline führt Checks (Brand Score, Fact Check, Privacy, AI Disclosure) durch.
+   - Es gibt einen etablierten Prozess zur manuellen Freigabe vor dem Export an Planungs-Tools (wie Postiz).
+4. **Operations & Runbooks**
+   - Klare Definitionen, wann Kennzahlen geprüft werden müssen (72h, 7d, 14d, 30d Review im `operations-runbook.md`).
+
+---
+
+## 🔴 Was noch fehlt (Der Gap zur "Ultimativen Marketingmaschine")
+
+### 1. Automatisierte Marktanalyse & Research (Layer: Research)
+- **Fehlend:** Der `Trend-Scout` (Bot-01) und der `Audience-Analyst` (Bot-02) sind im Code noch nicht aktiv. 
+- **Auswirkung:** Die Marktanalyse und Ideenfindung obliegt komplett dem menschlichen User. Eine "ultimative Maschine" sollte proaktiv wöchentliche Trend-Reports, Konkurrenz-Analysen und die "Top 3 Fragen der Zielgruppe" selbstständig generieren.
+
+### 2. Autonome Steuerung (Layer: Orchestrator)
+- **Fehlend:** Der `Orchestrator` (Bot-00) fehlt als aktiver Prozess. 
+- **Auswirkung:** Es gibt keinen Bot, der selbstständig einen Redaktionsplan (z.B. Montags 06:00 Uhr) auf Basis der Pareto-Strategie erstellt. Aktuell muss der User jeden Post manuell via "Intake"-UI anstoßen.
+
+### 3. Spezialisierte Agenten statt generischem Generator (Layer: Creation)
+- **Fehlend:** Die Codebasis greift nicht dynamisch auf die spezifischen Prompts der Copywriter-Bots (Bot-03 bis Bot-07) aus der JSON-Datei zu, um individuelle Persona-Tonalitäten aufrechtzuerhalten. Es fehlen echte "autonome Agenten-Workflows".
+
+### 4. Instagram-First Visualisierung (Strategie-Update v2.0)
+- **Fehlend:** Laut v2.0 ist Instagram ein gleichberechtigter Kanal. Dafür benötigt das System automatisierte Bild/Carousel-Workflows (via ComfyUI/Midjourney), angesteuert durch einen "Visual Prompt Bot". Das Runbook spricht bisher vor allem von Text-/Draft-Freigaben.
+
+### 5. Automatisierter Analytics-Feedback-Loop
+- **Fehlend:** Das 72h/7d/14d/30d-Review ist aktuell ein manueller Prozess laut Runbook. Die Maschine muss diese Analytics-Daten (via API von LinkedIn/Instagram/Postiz) selbstständig einlesen, um den `Orchestrator` über die Performance zu informieren und den Content-Demand-Score anzupassen.
+
+---
+
+## 🚀 Empfohlene nächste Schritte
+
+Um das Ziel der ultimativen Marketingmaschine zu erreichen, sollten wir in folgenden Phasen weiterentwickeln:
+
+1. **Aktivierung der Research-Bots:** Implementierung von Skripten (z.B. Python/n8n), die wöchentlich News und Konkurrenzdaten crawlen und dem User als Themen-Vorschläge ("Content-Demand-Score") präsentieren.
+2. **Entwicklung des Orchestrator-Moduls:** Ein Cron-Job, der jeden Montag den Redaktionskalender für alle 5 Kampagnen automatisch vorbefüllt, sodass der User im "Approval"-Schritt nur noch absegnen muss, statt alles manuell im "Intake" zu starten.
+3. **Integration der Bot-Architektur:** Refactoring der `content_generator.py`, damit sie die Tonalitäten und Vorgaben der 14 Bots aus der `bot_architektur.json` dynamisch als System-Prompts verwendet.
+4. **ComfyUI-Integration:** Automatisierte Erstellung von Carousel-Bildern für Instagram direkt als Attachment an den Draft.
