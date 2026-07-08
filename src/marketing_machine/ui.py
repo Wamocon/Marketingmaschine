@@ -77,6 +77,10 @@ def render_marketing_console() -> str:
       overflow-x: hidden;
     }
 
+    body.route-open {
+      overflow: hidden;
+    }
+
     button, input, select, textarea {
       font: inherit;
       min-width: 0;
@@ -253,7 +257,7 @@ def render_marketing_console() -> str:
 
     .layout {
       display: grid;
-      grid-template-columns: 318px minmax(0, 1fr);
+      grid-template-columns: minmax(0, 1fr);
       gap: 18px;
       padding: 18px;
       max-width: 100vw;
@@ -267,7 +271,7 @@ def render_marketing_console() -> str:
       min-width: 0;
       max-height: calc(100vh - 98px);
       overflow: auto;
-      display: grid;
+      display: none;
       gap: 12px;
     }
 
@@ -295,6 +299,8 @@ def render_marketing_console() -> str:
 
     .workspace {
       min-width: 0;
+      width: min(100%, 1480px);
+      margin: 0 auto;
       display: grid;
       gap: 14px;
     }
@@ -371,6 +377,7 @@ def render_marketing_console() -> str:
       height: 100%;
       min-height: 286px;
       object-fit: cover;
+      object-position: 82% center;
       display: block;
       transform: scale(1.02);
       animation: heroDrift 9s ease-in-out infinite alternate;
@@ -1005,6 +1012,124 @@ def render_marketing_console() -> str:
       display: block;
     }
 
+    .work-cards {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(180px, 1fr));
+      gap: 10px;
+    }
+
+    .work-card {
+      min-height: 118px;
+      padding: 14px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--surface-2);
+      display: grid;
+      align-content: space-between;
+      gap: 10px;
+      text-align: left;
+    }
+
+    .work-card strong {
+      display: block;
+      font-size: 14px;
+      line-height: 1.25;
+    }
+
+    .work-card span {
+      color: var(--muted);
+      font-size: 12px;
+      display: block;
+    }
+
+    .route-backdrop {
+      position: fixed;
+      inset: 0;
+      z-index: 60;
+      display: none;
+      place-items: start center;
+      padding: 72px 18px 18px;
+      background: rgba(16, 22, 21, 0.38);
+      backdrop-filter: blur(8px);
+    }
+
+    .route-backdrop.open {
+      display: grid;
+    }
+
+    .route-modal {
+      width: min(920px, 100%);
+      max-height: min(780px, calc(100vh - 96px));
+      overflow: auto;
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: 0 26px 80px rgba(20, 32, 31, 0.26);
+      animation: enter 180ms ease both;
+    }
+
+    .route-modal-head {
+      position: sticky;
+      top: 0;
+      z-index: 1;
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 18px;
+      background: var(--surface);
+      border-bottom: 1px solid var(--line);
+    }
+
+    .route-modal-body {
+      padding: 18px;
+      display: grid;
+      gap: 18px;
+    }
+
+    .route-section {
+      display: grid;
+      gap: 10px;
+    }
+
+    .route-section > span {
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .route-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(180px, 1fr));
+      gap: 10px;
+    }
+
+    .route-option {
+      min-height: 98px;
+      padding: 13px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--surface-2);
+      display: grid;
+      grid-template-columns: auto minmax(0, 1fr);
+      gap: 10px;
+      text-align: left;
+      align-items: start;
+    }
+
+    .route-option strong,
+    .route-option span {
+      display: block;
+    }
+
+    .route-option span {
+      color: var(--muted);
+      font-size: 12px;
+      margin-top: 3px;
+    }
+
     .mobile-only {
       display: none;
     }
@@ -1045,6 +1170,11 @@ def render_marketing_console() -> str:
       }
 
       .journey-board {
+        grid-template-columns: repeat(2, minmax(160px, 1fr));
+      }
+
+      .work-cards,
+      .route-grid {
         grid-template-columns: repeat(2, minmax(160px, 1fr));
       }
     }
@@ -1119,7 +1249,9 @@ def render_marketing_console() -> str:
       .field-grid,
       .checkbox-grid,
       .guide,
-      .journey-board {
+      .journey-board,
+      .work-cards,
+      .route-grid {
         grid-template-columns: 1fr;
       }
 
@@ -1129,6 +1261,19 @@ def render_marketing_console() -> str:
       }
 
       .screen-head {
+        display: grid;
+      }
+
+      .route-backdrop {
+        padding: 12px;
+        place-items: start stretch;
+      }
+
+      .route-modal {
+        max-height: calc(100vh - 24px);
+      }
+
+      .route-modal-head {
         display: grid;
       }
     }
@@ -1149,13 +1294,13 @@ def render_marketing_console() -> str:
           <option value="de">Deutsch</option>
           <option value="en">English</option>
         </select>
+        <button class="btn btn-secondary" type="button" data-open-routes="true">
+          <svg class="icon" viewBox="0 0 24 24"><path d="M4 6h16"/><path d="M4 12h16"/><path d="M4 18h16"/></svg>
+          Pages
+        </button>
         <button class="btn btn-secondary" type="button" id="themeToggle" title="Toggle theme">
           <svg class="icon" viewBox="0 0 24 24"><path d="M12 3v2M12 19v2M4.2 4.2l1.4 1.4M18.4 18.4l1.4 1.4M3 12h2M19 12h2M4.2 19.8l1.4-1.4M18.4 5.6l1.4-1.4"/><circle cx="12" cy="12" r="4"/></svg>
           Theme
-        </button>
-        <button class="btn btn-secondary" type="button" data-jump="status">
-          <svg class="icon" viewBox="0 0 24 24"><path d="M12 20v-6"/><path d="M6 20V10"/><path d="M18 20V4"/></svg>
-          Setup
         </button>
         <button class="btn btn-primary" type="button" id="weeklyPlanTop">
           <svg class="icon" viewBox="0 0 24 24"><path d="M4 5h16v16H4z"/><path d="M16 3v4M8 3v4M4 11h16"/></svg>
@@ -1163,6 +1308,66 @@ def render_marketing_console() -> str:
         </button>
       </div>
     </header>
+
+    <div class="route-backdrop" id="routeBackdrop" aria-hidden="true">
+      <div class="route-modal" role="dialog" aria-modal="true" aria-labelledby="routeTitle">
+        <div class="route-modal-head">
+          <div>
+            <h2 id="routeTitle">Where do you want to work?</h2>
+            <p class="subtle">Choose a page. Daily marketing work is first; setup and technical pages are below.</p>
+          </div>
+          <button class="btn btn-secondary" type="button" id="closeRouteMenu">Close</button>
+        </div>
+        <div class="route-modal-body">
+          <div class="route-section">
+            <span>Daily work</span>
+            <div class="route-grid">
+              <button class="route-option" type="button" data-jump="trends">
+                <svg class="icon" viewBox="0 0 24 24"><path d="M3 17l6-6 4 4 8-8"/><path d="M14 7h7v7"/></svg>
+                <span><strong>Find Trends & Reels</strong><span>Scan, select a trend, and create Reel options.</span></span>
+              </button>
+              <button class="route-option" type="button" data-jump="approval">
+                <svg class="icon" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg>
+                <span><strong>Review Drafts</strong><span>Approve only after proof, privacy, and brand fit are checked.</span></span>
+              </button>
+              <button class="route-option" type="button" data-jump="routing">
+                <svg class="icon" viewBox="0 0 24 24"><path d="M4 7h10"/><path d="m10 3 4 4-4 4"/><path d="M20 17H10"/><path d="m14 13-4 4 4 4"/></svg>
+                <span><strong>Send To Scheduler</strong><span>Prepare the approved post as a draft handoff.</span></span>
+              </button>
+              <button class="route-option" type="button" data-jump="intake">
+                <svg class="icon" viewBox="0 0 24 24"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
+                <span><strong>New Brief</strong><span>Start a custom campaign idea manually.</span></span>
+              </button>
+              <button class="route-option" type="button" data-jump="leads">
+                <svg class="icon" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-8 0v2"/><circle cx="12" cy="7" r="4"/><path d="M19 8v6"/><path d="M22 11h-6"/></svg>
+                <span><strong>Leads</strong><span>Record responses and prepare follow-up.</span></span>
+              </button>
+              <button class="route-option" type="button" data-jump="analytics">
+                <svg class="icon" viewBox="0 0 24 24"><path d="M4 19V5"/><path d="M4 19h16"/><path d="M8 15l3-4 3 2 4-7"/></svg>
+                <span><strong>Improve Results</strong><span>Review KPI signals and decide what to change.</span></span>
+              </button>
+            </div>
+          </div>
+          <div class="route-section">
+            <span>Setup and advanced</span>
+            <div class="route-grid">
+              <button class="route-option" type="button" data-jump="status">
+                <svg class="icon" viewBox="0 0 24 24"><path d="M12 20v-6"/><path d="M6 20V10"/><path d="M18 20V4"/></svg>
+                <span><strong>Setup</strong><span>Check sources, model keys, and connected services.</span></span>
+              </button>
+              <button class="route-option" type="button" data-jump="phases">
+                <svg class="icon" viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+                <span><strong>Build Status</strong><span>See what is ready, partial, or blocked.</span></span>
+              </button>
+              <button class="route-option" type="button" data-jump="creative">
+                <svg class="icon" viewBox="0 0 24 24"><path d="M4 5h16v14H4z"/><path d="m4 15 4-4 4 4 3-3 5 5"/></svg>
+                <span><strong>Creative Brief</strong><span>Create image or video generation instructions.</span></span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
 
     <div class="layout">
       <aside class="sidebar">
@@ -1284,9 +1489,9 @@ def render_marketing_console() -> str:
             </div>
           </div>
           <div class="panel operator-queue" id="metricGrid">
-            <div class="queue-item"><small>Setup</small><strong id="metricRequired">...</strong><span class="subtle">sources and model</span></div>
-            <div class="queue-item"><small>Content</small><strong id="metricRecent">...</strong><span class="subtle">drafts saved</span></div>
-            <div class="queue-item"><small>Needs review</small><strong id="metricReview">...</strong><span class="subtle">waiting for approval</span></div>
+            <div class="queue-item"><small>Trend search</small><strong id="metricRequired">...</strong><span class="subtle">live sources</span></div>
+            <div class="queue-item"><small>Drafts</small><strong id="metricRecent">...</strong><span class="subtle">saved</span></div>
+            <div class="queue-item"><small>Review</small><strong id="metricReview">...</strong><span class="subtle">waiting</span></div>
             <div class="queue-item"><small>Publishing safety</small><strong id="metricGuard">On</strong><span class="subtle">manual approval</span></div>
           </div>
         </div>
@@ -1301,9 +1506,7 @@ def render_marketing_console() -> str:
               <button class="btn btn-primary" type="button" data-jump="trends">Trend Scan</button>
               <button class="btn btn-primary" type="button" data-jump="intake">New Brief</button>
               <button class="btn btn-secondary" type="button" data-jump="approval">Approve Draft</button>
-              <button class="btn btn-secondary" type="button" data-jump="leads">Add Lead</button>
-              <button class="btn btn-secondary" type="button" data-jump="routing">Route</button>
-              <button class="btn btn-secondary" type="button" data-jump="analytics">Review KPIs</button>
+              <button class="btn btn-secondary" type="button" data-open-routes="true">All Pages</button>
             </div>
           </div>
           <div class="journey-board">
@@ -1314,14 +1517,16 @@ def render_marketing_console() -> str:
           </div>
           <div class="panel" style="margin-top:14px">
             <div class="panel-header">
-              <h3>Recent States</h3>
+              <div>
+                <h3>Current work</h3>
+                <p class="subtle">Recent drafts and what should happen next.</p>
+              </div>
               <button class="btn btn-secondary" type="button" id="copyRecentSummary">Copy Summary</button>
             </div>
             <div class="panel-body">
-              <table class="mini-table">
-                <thead><tr><th>Content</th><th>Campaign</th><th>Status</th><th>Next</th></tr></thead>
-                <tbody id="recentTableBody"><tr><td colspan="4">Loading...</td></tr></tbody>
-              </table>
+              <div class="work-cards" id="recentCards">
+                <div class="work-card"><strong>Loading recent work...</strong><span>Please wait a moment.</span></div>
+              </div>
             </div>
           </div>
         </section>
@@ -2078,11 +2283,34 @@ def render_marketing_console() -> str:
       ["Pick a campaign, find a useful trend, create Reel options, approve the best draft.", "Kampagne waehlen, Trend finden, Reel-Optionen erstellen und den besten Entwurf freigeben."],
       ["Start Trend Scan", "Trend-Scan starten"],
       ["Review Drafts", "Entwuerfe pruefen"],
+      ["Pages", "Seiten"],
+      ["All Pages", "Alle Seiten"],
+      ["Where do you want to work?", "Wo willst du arbeiten?"],
+      ["Choose a page. Daily marketing work is first; setup and technical pages are below.", "Waehle eine Seite. Die taegliche Marketingarbeit steht oben; Setup und technische Seiten darunter."],
+      ["Close", "Schliessen"],
+      ["Daily work", "Taegliche Arbeit"],
+      ["Setup and advanced", "Setup und Erweitert"],
+      ["Find Trends & Reels", "Trends und Reels finden"],
+      ["Scan, select a trend, and create Reel options.", "Scannen, Trend waehlen und Reel-Optionen erstellen."],
+      ["Review Drafts", "Entwuerfe pruefen"],
+      ["Approve only after proof, privacy, and brand fit are checked.", "Erst freigeben, wenn Beleg, Datenschutz und Markenfit geprueft sind."],
+      ["Send To Scheduler", "An Scheduler geben"],
+      ["Prepare the approved post as a draft handoff.", "Freigegebenen Beitrag als Entwurf vorbereiten."],
+      ["Start a custom campaign idea manually.", "Eine eigene Kampagnenidee manuell starten."],
+      ["Record responses and prepare follow-up.", "Reaktionen erfassen und Follow-up vorbereiten."],
+      ["Improve Results", "Ergebnisse verbessern"],
+      ["Review KPI signals and decide what to change.", "KPI-Signale pruefen und die naechste Aenderung entscheiden."],
+      ["Check sources, model keys, and connected services.", "Quellen, Modell-Keys und verbundene Dienste pruefen."],
+      ["Build Status", "Build-Status"],
+      ["See what is ready, partial, or blocked.", "Sehen, was bereit, teilweise fertig oder blockiert ist."],
+      ["Create image or video generation instructions.", "Bild- oder Video-Generierungsbriefings erstellen."],
       ["Checking setup", "Setup wird geprueft"],
-      ["sources and model", "Quellen und Modell"],
-      ["drafts saved", "Entwuerfe gespeichert"],
-      ["Needs review", "Zu pruefen"],
-      ["waiting for approval", "wartet auf Freigabe"],
+      ["Trend search", "Trendsuche"],
+      ["live sources", "Live-Quellen"],
+      ["Drafts", "Entwuerfe"],
+      ["saved", "gespeichert"],
+      ["Review", "Pruefung"],
+      ["waiting", "wartet"],
       ["Publishing safety", "Publishing-Schutz"],
       ["manual approval", "manuelle Freigabe"],
       ["Choose one next step. The system keeps posts as drafts until you approve them.", "Waehle den naechsten Schritt. Beitraege bleiben Entwuerfe, bis du sie freigibst."],
@@ -2099,6 +2327,10 @@ def render_marketing_console() -> str:
       ["Generate hooks, shot lists, captions, and CTA ideas.", "Hooks, Shotlists, Captions und CTA-Ideen erzeugen."],
       ["Check proof, privacy, brand fit, and AI disclosure.", "Belege, Datenschutz, Markenfit und AI-Kennzeichnung pruefen."],
       ["Prepare a draft-only handoff after approval.", "Nach Freigabe einen reinen Entwurf vorbereiten."],
+      ["Current work", "Aktuelle Arbeit"],
+      ["Recent drafts and what should happen next.", "Aktuelle Entwuerfe und der naechste Schritt."],
+      ["Loading recent work...", "Aktuelle Arbeit wird geladen..."],
+      ["Please wait a moment.", "Einen Moment bitte."],
       ["Start with intake, then approval, then analytics. The system stays draft-only until a human publishes in the platform.", "Beginne mit Eingabe, dann Freigabe, dann Analyse. Das System bleibt im Entwurfsmodus, bis ein Mensch auf der Plattform veröffentlicht."],
       ["New Brief", "Neues Briefing"],
       ["Approve Draft", "Entwurf freigeben"],
@@ -2493,6 +2725,20 @@ def render_marketing_console() -> str:
       showToast.timer = window.setTimeout(() => node.classList.remove("show"), 2200);
     }
 
+    function openRouteMenu() {
+      const backdrop = $("routeBackdrop");
+      backdrop.classList.add("open");
+      backdrop.setAttribute("aria-hidden", "false");
+      document.body.classList.add("route-open");
+    }
+
+    function closeRouteMenu() {
+      const backdrop = $("routeBackdrop");
+      backdrop.classList.remove("open");
+      backdrop.setAttribute("aria-hidden", "true");
+      document.body.classList.remove("route-open");
+    }
+
     function iconPill(text, mode = "neutral") {
       return `<span class="pill ${mode}">${escapeHtml(text)}</span>`;
     }
@@ -2646,14 +2892,28 @@ def render_marketing_console() -> str:
         </button>
       `).join("") : `<span class="pill warn">${t("noMatchingContent")}</span>`;
 
-      $("recentTableBody").innerHTML = filtered.slice(0, 10).map((item) => `
-        <tr>
-          <td>${escapeHtml(item.content_id)}</td>
-          <td>${escapeHtml(item.campaign || "")}</td>
-          <td>${escapeHtml(statusLabel(item.status || ""))}</td>
-          <td>${escapeHtml(statusLabel(item.next_step || ""))}</td>
-        </tr>
-      `).join("") || `<tr><td colspan="4">${t("noContentYet")}</td></tr>`;
+      const tableBody = $("recentTableBody");
+      if (tableBody) {
+        tableBody.innerHTML = filtered.slice(0, 10).map((item) => `
+          <tr>
+            <td>${escapeHtml(item.content_id)}</td>
+            <td>${escapeHtml(item.campaign || "")}</td>
+            <td>${escapeHtml(statusLabel(item.status || ""))}</td>
+            <td>${escapeHtml(statusLabel(item.next_step || ""))}</td>
+          </tr>
+        `).join("") || `<tr><td colspan="4">${t("noContentYet")}</td></tr>`;
+      }
+
+      const cards = $("recentCards");
+      if (cards) {
+        cards.innerHTML = filtered.length ? filtered.slice(0, 6).map((item) => `
+          <button type="button" class="work-card recent-item" data-content-id="${escapeHtml(item.content_id)}">
+            <span>${escapeHtml(item.campaign || "Campaign")}</span>
+            <strong>${escapeHtml(statusLabel(item.status || "status"))}</strong>
+            <span>${escapeHtml(statusLabel(item.next_step || "next"))}</span>
+          </button>
+        `).join("") : `<div class="work-card"><strong>${t("noContentYet")}</strong><span>${currentUiLanguage === "de" ? "Starte mit einem Trend-Scan oder Briefing." : "Start with a trend scan or brief."}</span></div>`;
+      }
 
       document.querySelectorAll(".recent-item").forEach((button) => {
         button.addEventListener("click", () => selectContent(button.dataset.contentId));
@@ -3003,15 +3263,17 @@ def render_marketing_console() -> str:
     async function refreshStatus() {
       const data = await getJson("/integrations/status");
       setJson("statusResult", data);
-      const requiredOk = (data.required || []).every((item) => item.ok);
-      const kimi = (data.checks || []).find((item) => item.name === "kimi");
+      const sourceNames = new Set(["searxng", "google_search_key", "google_search_engine", "reddit_key", "tiktok_research_key", "instagram_key", "instagram_business_account"]);
+      const liveSourcesReady = (data.checks || []).some((item) => sourceNames.has(item.name) && (item.ok || item.configured));
+      const sourceLabel = liveSourcesReady
+        ? (currentUiLanguage === "de" ? "Live-Quellen bereit" : "Live sources ready")
+        : (currentUiLanguage === "de" ? "Live-Quellen fehlen" : "Live sources needed");
       $("healthPills").innerHTML = [
-        iconPill(requiredOk ? t("requiredOk") : t("requiredDegraded"), requiredOk ? "ok" : "bad"),
-        iconPill(kimi && kimi.ok ? t("kimiOk") : t("kimiOptional"), kimi && kimi.ok ? "ok" : "warn"),
+        iconPill(sourceLabel, liveSourcesReady ? "ok" : "warn"),
         iconPill(t("humanApprovalOn"), "ok")
       ].join("");
-      $("metricRequired").textContent = requiredOk ? "OK" : statusLabel("check");
-      $("metricRequired").style.color = requiredOk ? "var(--green)" : "var(--red)";
+      $("metricRequired").textContent = liveSourcesReady ? (currentUiLanguage === "de" ? "Bereit" : "Ready") : "Setup";
+      $("metricRequired").style.color = liveSourcesReady ? "var(--green)" : "var(--amber)";
       $("metricGuard").style.color = "var(--green)";
       $("serviceSummary").innerHTML = `<table class="mini-table"><thead><tr><th>${t("service")}</th><th>${t("state")}</th><th>URL</th></tr></thead><tbody>${
         (data.checks || []).map((item) => `<tr><td>${escapeHtml(item.name)}</td><td>${item.ok ? iconPill("OK", "ok") : iconPill(item.required ? t("requiredIssue") : t("optionalIssue"), item.required ? "bad" : "warn")}</td><td>${escapeHtml(item.url || "")}</td></tr>`).join("")
@@ -3109,7 +3371,18 @@ def render_marketing_console() -> str:
     }
 
     document.querySelectorAll(".nav-tab").forEach((button) => button.addEventListener("click", () => setScreen(button.dataset.screen)));
-    document.querySelectorAll("[data-jump]").forEach((button) => button.addEventListener("click", () => setScreen(button.dataset.jump)));
+    document.querySelectorAll("[data-open-routes]").forEach((button) => button.addEventListener("click", openRouteMenu));
+    $("closeRouteMenu").addEventListener("click", closeRouteMenu);
+    $("routeBackdrop").addEventListener("click", (event) => {
+      if (event.target === $("routeBackdrop")) closeRouteMenu();
+    });
+    document.addEventListener("keydown", (event) => {
+      if (event.key === "Escape") closeRouteMenu();
+    });
+    document.querySelectorAll("[data-jump]").forEach((button) => button.addEventListener("click", () => {
+      setScreen(button.dataset.jump);
+      closeRouteMenu();
+    }));
     document.querySelectorAll("[data-copy]").forEach((button) => button.addEventListener("click", () => copyText($(button.dataset.copy).textContent)));
 
     $("themeToggle").addEventListener("click", () => {

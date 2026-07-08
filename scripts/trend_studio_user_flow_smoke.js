@@ -15,7 +15,9 @@ async function main() {
   await page.goto(`${baseUrl}/ui`, { waitUntil: "networkidle" });
   await page.waitForSelector("#screen-dashboard.active", { state: "visible" });
 
-  await page.click('[data-screen="trends"]');
+  await page.click('[data-open-routes="true"]');
+  await page.waitForSelector("#routeBackdrop.open", { state: "visible" });
+  await page.click('#routeBackdrop [data-jump="trends"]');
   await page.waitForSelector("#screen-trends.active", { state: "visible" });
 
   await page.click("#runTrendScan");
@@ -36,7 +38,9 @@ async function main() {
   const contentId = await page.inputValue("#approvalContentId");
   assert.match(contentId, /^reel-concept-/);
 
-  await page.click('[data-screen="approval"]');
+  await page.click('[data-open-routes="true"]');
+  await page.waitForSelector("#routeBackdrop.open", { state: "visible" });
+  await page.click('#routeBackdrop [data-jump="approval"]');
   await page.waitForSelector("#screen-approval.active", { state: "visible" });
   assert.equal(await page.inputValue("#approvalContentId"), contentId);
   assert.match(await page.textContent("#postPreview"), /Instagram-Reel-Entwurf/);
