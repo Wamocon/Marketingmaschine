@@ -12,7 +12,7 @@ from .schemas import ContentBrief, ContentStatus
 def data_dir() -> Path:
     root = Path(os.environ.get("MARKETING_MACHINE_DATA_DIR", "runtime-data"))
     root.mkdir(parents=True, exist_ok=True)
-    for child in ("states", "events", "performance", "leads", "outbox"):
+    for child in ("states", "events", "performance", "leads", "outbox", "trend_runs", "reel_concepts", "learning"):
         (root / child).mkdir(parents=True, exist_ok=True)
     return root
 
@@ -26,7 +26,7 @@ def brief_from_dict(data: dict[str, Any]) -> ContentBrief:
 class JsonStore:
     def __init__(self, root: Path | None = None) -> None:
         self.root = root or data_dir()
-        for child in ("states", "events", "performance", "leads", "outbox"):
+        for child in ("states", "events", "performance", "leads", "outbox", "trend_runs", "reel_concepts", "learning"):
             (self.root / child).mkdir(parents=True, exist_ok=True)
 
     def list_states(self, limit: int = 25) -> list[dict[str, Any]]:
@@ -196,6 +196,80 @@ class JsonStore:
                 break
         return items
 
+    def save_trend_run(self, payload: dict[str, Any]) -> Path:
+        path = self.root / "trend_runs" / f"{payload['id']}.json"
+        path.write_text(json.dumps(payload, indent=2, ensure_ascii=False), encoding="utf-8")
+        return path
+
+    def load_trend_run(self, run_id: str) -> dict[str, Any]:
+        path = self.root / "trend_runs" / f"{run_id}.json"
+        if not path.exists():
+            raise FileNotFoundError(f"trend run not found: {run_id}")
+        return json.loads(path.read_text(encoding="utf-8"))
+
+    def list_trend_runs(self, limit: int = 25) -> list[dict[str, Any]]:
+        paths = sorted((self.root / "trend_runs").glob("*.json"), key=lambda path: path.stat().st_mtime, reverse=True)
+        items: list[dict[str, Any]] = []
+        for path in paths[: max(0, limit)]:
+            try:
+                payload = json.loads(path.read_text(encoding="utf-8"))
+            except json.JSONDecodeError:
+                continue
+            campaigns = payload.get("campaigns", [])
+            trend_count = sum(len(item.get("trends", [])) for item in campaigns if isinstance(item, dict))
+            items.append(
+                {
+                    "id": payload.get("id", path.stem),
+                    "status": payload.get("status", ""),
+                    "run_started_at": payload.get("run_started_at", ""),
+                    "lookback_days": payload.get("lookback_days", 0),
+                    "platforms": payload.get("platforms", []),
+                    "campaign_count": len(campaigns) if isinstance(campaigns, list) else 0,
+                    "trend_count": trend_count,
+                    "source_adapters": payload.get("source_adapters", []),
+                }
+            )
+        return items
+
+    def save_reel_concept(self, payload: dict[str, Any]) -> Path:
+        path = self.root / "reel_concepts" / f"{payload['id']}.json"
+        path.write_text(json.dumps(payload, indent=2, ensure_ascii=False), encoding="utf-8")
+        return path
+
+    def load_reel_concept(self, concept_id: str) -> dict[str, Any]:
+        path = self.root / "reel_concepts" / f"{concept_id}.json"
+        if not path.exists():
+            raise FileNotFoundError(f"reel concept not found: {concept_id}")
+        return json.loads(path.read_text(encoding="utf-8"))
+
+    def list_reel_concepts(self, limit: int = 25) -> list[dict[str, Any]]:
+        paths = sorted((self.root / "reel_concepts").glob("*.json"), key=lambda path: path.stat().st_mtime, reverse=True)
+        items: list[dict[str, Any]] = []
+        for path in paths[: max(0, limit)]:
+            try:
+                payload = json.loads(path.read_text(encoding="utf-8"))
+            except json.JSONDecodeError:
+                continue
+            items.append(
+                {
+                    "id": payload.get("id", path.stem),
+                    "status": payload.get("status", "draft"),
+                    "run_id": payload.get("run_id", ""),
+                    "campaign_id": payload.get("campaign_id", ""),
+                    "trend_id": payload.get("trend_id", ""),
+                    "created_at": payload.get("created_at", ""),
+                    "variant_count": len(payload.get("variants", [])),
+                    "user_prompt": payload.get("user_prompt", ""),
+                }
+            )
+        return items
+
+    def append_learning(self, payload: dict[str, Any]) -> Path:
+        path = self.root / "learning" / "records.jsonl"
+        with path.open("a", encoding="utf-8") as handle:
+            handle.write(json.dumps(payload, ensure_ascii=False) + "\n")
+        return path
+
     def cleanup_test_data(self, prefixes: tuple[str, ...] = ("mock-", "smoke-"), *, dry_run: bool = False) -> dict[str, Any]:
         """Remove generated smoke/mock records without touching real campaign data."""
 
@@ -233,6 +307,18 @@ class JsonStore:
         for path in sorted((self.root / "outbox").glob("*.jsonl")):
             removed = self._filter_jsonl(path, prefixes=prefixes, dry_run=dry_run)
             summary["outbox_removed"] += removed
+
+        for path in sorted((self.root / "reel_concepts").glob("*.json")):
+            try:
+                payload = json.loads(path.read_text(encoding="utf-8"))
+            except json.JSONDecodeError:
+                continue
+            if self._contains_test_id(payload, prefixes):
+                if not dry_run:
+                    path.unlink()
+
+        for path in sorted((self.root / "learning").glob("*.jsonl")):
+            self._filter_jsonl(path, prefixes=prefixes, dry_run=dry_run)
 
         summary["content_ids"] = sorted(set(summary["content_ids"]))
         return summary

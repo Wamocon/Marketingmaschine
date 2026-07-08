@@ -1,0 +1,8 @@
+{
+  "scripts": {
+    "smoke:trend-studio": "node scripts/trend_studio_user_flow_smoke.js"
+  },
+  "devDependencies": {
+    "playwright": "^1.61.1"
+  }
+}

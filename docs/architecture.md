@@ -13,7 +13,7 @@ It is designed for a lean team with human approval, local/private AI, and open-s
 | Control | Agent workflow, state, approvals, audit trail | `src/marketing_machine` plus future LangGraph production graph |
 | Workflow | Scheduled jobs, retries, external API glue | `deploy/n8n/workflows` and n8n queue mode compose template |
 | Model | Local and optional cloud model routing | `config/model-routing.json` |
-| Knowledge | Evidence vault, approved claims, consent, campaign facts | `db/schema.sql` and strategy JSON/Markdown |
+| Knowledge | Evidence vault, approved claims, consent, campaign facts, trend provenance, concept learning records | `db/schema.sql` and strategy JSON/Markdown |
 | Governance | Allowlists, blocked tools, policy checks, approval gates | `config/governance-policy.json` and `governance.py` |
 | Creative | Brand-safe image/video workflow contracts | `deploy/comfyui/wamocon-creative-contract.json` |
 | Publishing | Draft-only scheduling after approval | Postiz/Metricool integration contracts |
@@ -23,6 +23,7 @@ It is designed for a lean team with human approval, local/private AI, and open-s
 ## Data Flow
 
 1. Orchestrator creates a content brief from campaign, persona, and current priorities.
+1. Trend Studio can run a 10-day public-source scan, group source-backed signals by campaign, and generate Instagram Reel concepts.
 2. Evidence gate requires proof sources before drafting.
 3. Campaign agent drafts content using local/private model route by default.
 4. Compliance gate checks blocked claims, proof, consent, and hashtag limits.

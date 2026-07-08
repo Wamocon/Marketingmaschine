@@ -13,8 +13,15 @@
       "id": "research",
       "role": "Tracks public competitor topics, platform trends, audience questions, and keyword gaps.",
       "model_route": "local_research",
-      "allowed_tools": ["search_public_sources", "write_experiment_record"],
+      "allowed_tools": ["search_public_sources", "write_trend_research", "write_experiment_record"],
       "requires_human_approval_for": ["using_competitor_quote"]
+    },
+    {
+      "id": "trend-studio",
+      "role": "Runs 10-day public trend scans across configured sources and turns selected signals into topic-locked Instagram Reel concepts.",
+      "model_route": "local_research",
+      "allowed_tools": ["search_public_sources", "write_trend_research", "write_reel_concept", "write_learning_record"],
+      "requires_human_approval_for": ["approve_reel_concept_for_publication", "using_external_trend_claim_publicly"]
     },
     {
       "id": "evidence-vault",

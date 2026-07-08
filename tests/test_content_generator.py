@@ -33,7 +33,7 @@ class ContentGeneratorTests(unittest.TestCase):
         self.assertIn("Nächster Schritt: QA-Risikoaudit anfragen", generated.public_copy)
         self.assertIn("Nachweis zum Anhängen", generated.public_copy)
         self.assertNotIn("replace this deterministic draft", generated.public_copy)
-        self.assertTrue(any("Nachweis vor Veröffentlichung" in note for note in generated.review_notes))
+        self.assertTrue(any("Vor dem Posten pruefen" in note for note in generated.review_notes))
 
     def test_english_linkedin_copy_remains_available(self):
         generated = generate_public_copy(
@@ -47,7 +47,7 @@ class ContentGeneratorTests(unittest.TestCase):
 
         self.assertIn("Draft LinkedIn post", generated.public_copy)
         self.assertIn("CTA: Book a QA Risk Audit", generated.public_copy)
-        self.assertTrue(any("Proof required" in note for note in generated.review_notes))
+        self.assertTrue(any("Before posting, check proof" in note for note in generated.review_notes))
 
     def test_instagram_copy_caps_hashtags(self):
         generated = generate_public_copy(

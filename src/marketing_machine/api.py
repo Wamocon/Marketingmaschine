@@ -5,6 +5,7 @@ from typing import Any
 
 from fastapi import FastAPI, HTTPException, Query
 from fastapi.responses import HTMLResponse
+from fastapi.staticfiles import StaticFiles
 
 from .analytics import evaluate_performance
 from .evidence import EvidenceVault
@@ -16,12 +17,38 @@ from .routing import route_lead as route_lead_to_target
 from .routing import route_scheduler_draft as route_scheduler_draft_to_target
 from .schemas import ApprovalRecord, ContentBrief, PerformanceRecord, ReviewDecision
 from .storage import JsonStore, brief_from_dict
+from .trend_research import concept_to_content_brief, generate_reel_concepts, run_trend_research
 from .ui import render_marketing_console
 from .workflow import MarketingWorkflow, WorkflowState
 
 
 def repo_root() -> Path:
     return Path(__file__).resolve().parents[2]
+
+
+def load_runtime_env() -> None:
+    import os
+
+    candidates = [
+        os.environ.get("MARKETING_MACHINE_ENV_FILE", ""),
+        str(repo_root() / "deploy" / "marketing-agent.generated.env"),
+        str(repo_root() / "config" / "integrations.local.env"),
+    ]
+    for candidate in candidates:
+        if not candidate:
+            continue
+        path = Path(candidate)
+        if not path.exists():
+            continue
+        for raw_line in path.read_text(encoding="utf-8").splitlines():
+            line = raw_line.strip()
+            if not line or line.startswith("#") or "=" not in line:
+                continue
+            key, value = line.split("=", 1)
+            key = key.strip()
+            value = value.strip().strip('"').strip("'")
+            if key and key not in os.environ:
+                os.environ[key] = value
 
 
 def load_policy() -> GovernancePolicy:
@@ -32,7 +59,22 @@ def load_evidence_vault() -> EvidenceVault:
     return EvidenceVault.from_json_file(repo_root() / "config" / "evidence-vault.json")
 
 
+def env_configured(name: str, *, required: bool = False, label: str | None = None) -> dict[str, Any]:
+    import os
+
+    return {
+        "name": label or name.lower(),
+        "ok": bool(os.environ.get(name, "").strip()),
+        "required": required,
+        "configured": bool(os.environ.get(name, "").strip()),
+        "secret_env": name,
+    }
+
+
+load_runtime_env()
+
 app = FastAPI(title="WAMOCON Marketing-Maschine Agent API", version="0.1.0")
+app.mount("/static", StaticFiles(directory=Path(__file__).resolve().parent / "static"), name="static")
 
 
 @app.get("/", response_class=HTMLResponse)
@@ -96,6 +138,36 @@ def default_briefs() -> list[ContentBrief]:
             test_variable="proof_asset",
             language="de-DE",
         ),
+        ContentBrief(
+            id="k3-lfa-azubi-weekly",
+            campaign="K3 LFA Azubi",
+            persona="Azubi, Ausbilder oder HR-Verantwortliche",
+            channel="Instagram",
+            format="reel",
+            objective="LFA und moderne Fachinformatiker-Ausbildung mit authentischen Einblicken positionieren.",
+            cta="LFA-Demo oder Ausbildungsplatz-Info anfragen",
+            proof_sources=["Kampagnen/kampagne_3_lfa_azubis.json"],
+            utm={"utm_source": "instagram", "utm_medium": "organic_reel", "utm_campaign": "k3_lfa_azubi"},
+            hypothesis="Authentische LFA-Reels erzeugen Saves, Profilbesuche und qualifizierte Ausbildungs-/B2B-Anfragen.",
+            test_variable="format",
+            language="de-DE",
+            hashtags=["Ausbildung", "FIAE", "LFA", "EdTech", "WAMOCON"],
+        ),
+        ContentBrief(
+            id="k4-employee-brand-weekly",
+            campaign="K4 Mitarbeiter",
+            persona="Bewerber und B2B-Entscheider",
+            channel="Instagram",
+            format="reel",
+            objective="WAMOCON-Team, Kultur und Consulting-Vertrauen durch menschliche Einblicke sichtbar machen.",
+            cta="Team kennenlernen",
+            proof_sources=["Kampagnen/kampagne_4_mitarbeiter.json"],
+            utm={"utm_source": "instagram", "utm_medium": "organic_reel", "utm_campaign": "k4_employee_brand"},
+            hypothesis="Mitarbeiternahe Reels bauen Vertrauen fuer Recruiting und Consulting-Anfragen auf.",
+            test_variable="story_angle",
+            language="de-DE",
+            hashtags=["EmployerBranding", "TeamWAMOCON", "ITKarriere", "BehindTheScenes", "Eschborn"],
+        ),
     ]
 
 
@@ -135,6 +207,111 @@ def weekly_planning(payload: dict[str, Any]) -> dict[str, Any]:
         "created": created,
         "next_steps": ["review generated drafts", "approve or request revision", "schedule approved draft-only payloads"]
     }
+
+
+@app.post("/workflows/trend-research")
+def trend_research(payload: dict[str, Any]) -> dict[str, Any]:
+    store = JsonStore()
+    try:
+        trend_run = run_trend_research(repo_root(), payload=payload, policy=load_policy())
+    except ValueError as exc:
+        raise HTTPException(status_code=422, detail=str(exc)) from exc
+    store.save_trend_run(trend_run)
+    store.append_event(
+        "trend_research",
+        {
+            "run_id": trend_run["id"],
+            "status": trend_run["status"],
+            "lookback_days": trend_run["lookback_days"],
+            "platforms": trend_run["platforms"],
+            "source_adapters": trend_run["source_adapters"],
+        },
+    )
+    return {"status": "created", "run_id": trend_run["id"], "trend_run": trend_run}
+
+
+@app.get("/workflows/trend-research/runs")
+def list_trend_runs(limit: int = Query(default=25, ge=1, le=100)) -> dict[str, Any]:
+    return {"items": JsonStore().list_trend_runs(limit=limit)}
+
+
+@app.get("/workflows/trend-research/runs/{run_id}")
+def get_trend_run(run_id: str) -> dict[str, Any]:
+    try:
+        return JsonStore().load_trend_run(run_id)
+    except FileNotFoundError as exc:
+        raise HTTPException(status_code=404, detail=f"trend run not found: {run_id}") from exc
+
+
+@app.get("/workflows/reel-concepts")
+def list_reel_concepts(limit: int = Query(default=25, ge=1, le=100)) -> dict[str, Any]:
+    return {"items": JsonStore().list_reel_concepts(limit=limit)}
+
+
+@app.post("/workflows/reel-concepts")
+def create_reel_concepts(payload: dict[str, Any]) -> dict[str, Any]:
+    store = JsonStore()
+    run_id = str(payload.get("run_id", "")).strip()
+    campaign_id = str(payload.get("campaign_id", "")).strip()
+    trend_id = str(payload.get("trend_id", "")).strip()
+    if not run_id or not campaign_id or not trend_id:
+        raise HTTPException(status_code=422, detail="run_id, campaign_id, and trend_id are required")
+    try:
+        trend_run = store.load_trend_run(run_id)
+        concept = generate_reel_concepts(
+            trend_run,
+            campaign_id=campaign_id,
+            trend_id=trend_id,
+            user_prompt=str(payload.get("user_prompt", "")),
+            variant_count=int(payload.get("variant_count", 4)),
+        )
+    except FileNotFoundError as exc:
+        raise HTTPException(status_code=404, detail=str(exc)) from exc
+    except ValueError as exc:
+        raise HTTPException(status_code=422, detail=str(exc)) from exc
+    store.save_reel_concept(concept)
+    store.append_event(
+        "reel_concept",
+        {
+            "concept_id": concept["id"],
+            "run_id": concept["run_id"],
+            "campaign_id": concept["campaign_id"],
+            "trend_id": concept["trend_id"],
+            "variant_count": len(concept["variants"]),
+        },
+    )
+    return {"status": "created", "concept_id": concept["id"], "concept": concept}
+
+
+@app.post("/workflows/reel-concepts/{concept_id}/approve")
+def approve_reel_concept(concept_id: str, payload: dict[str, Any]) -> dict[str, Any]:
+    store = JsonStore()
+    try:
+        concept = store.load_reel_concept(concept_id)
+        brief = concept_to_content_brief(concept, variant_id=str(payload.get("variant_id", "") or "") or None)
+    except FileNotFoundError as exc:
+        raise HTTPException(status_code=404, detail=str(exc)) from exc
+    except ValueError as exc:
+        raise HTTPException(status_code=422, detail=str(exc)) from exc
+    state = create_state_for_brief(brief)
+    concept["status"] = "approved_for_content_brief"
+    concept["approved_variant_id"] = payload.get("variant_id") or state["brief"].get("reel_concept", {}).get("id", "")
+    concept["content_id"] = brief.id
+    store.save_reel_concept(concept)
+    store.save_state(state)
+    store.append_learning(
+        {
+            "event": "reel_concept_approved",
+            "concept_id": concept_id,
+            "content_id": brief.id,
+            "campaign_id": concept.get("campaign_id", ""),
+            "trend_id": concept.get("trend_id", ""),
+            "selected_variant_id": concept.get("approved_variant_id", ""),
+            "created_at": state["brief"].get("created_at", ""),
+        }
+    )
+    store.append_event("reel_concept_approval", {"concept_id": concept_id, "content_id": brief.id, "state": state})
+    return {"status": "approved", "concept_id": concept_id, "content_id": brief.id, "state": state}
 
 
 @app.post("/workflows/create-content")
@@ -257,6 +434,12 @@ def integrations_status() -> dict[str, Any]:
         check_url("litellm", f"{litellm.rstrip('/')}/health/readiness"),
         check_url("opa", f"{opa.rstrip('/')}/health"),
         check_url("searxng", f"{searxng.rstrip('/')}/"),
+        env_configured("GOOGLE_CSE_API_KEY", label="google_search_key"),
+        env_configured("GOOGLE_CSE_ID", label="google_search_engine"),
+        env_configured("REDDIT_BEARER_TOKEN", label="reddit_key"),
+        env_configured("TIKTOK_RESEARCH_CLIENT_TOKEN", label="tiktok_research_key"),
+        env_configured("INSTAGRAM_ACCESS_TOKEN", label="instagram_key"),
+        env_configured("INSTAGRAM_BUSINESS_ACCOUNT_ID", label="instagram_business_account"),
         check_url("qdrant", f"{qdrant.rstrip('/')}/"),
         check_url("prometheus", f"{prometheus.rstrip('/')}/-/ready"),
         check_url("grafana", f"{grafana.rstrip('/')}/api/health"),

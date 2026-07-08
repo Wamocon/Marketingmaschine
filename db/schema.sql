@@ -28,6 +28,11 @@ create table if not exists content_briefs (
   status text not null,
   risk_flags jsonb not null default '[]'::jsonb,
   hashtags jsonb not null default '[]'::jsonb,
+  trend_id text,
+  trend_summary text,
+  trend_sources jsonb not null default '[]'::jsonb,
+  reel_concept jsonb not null default '{}'::jsonb,
+  user_prompt text,
   draft text,
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
@@ -113,6 +118,64 @@ create table if not exists routing_outbox (
   created_at timestamptz not null default now()
 );
 
+create table if not exists trend_research_runs (
+  id text primary key,
+  status text not null,
+  run_started_at timestamptz not null,
+  lookback_days integer not null default 10,
+  lookback_start timestamptz not null,
+  platforms jsonb not null default '[]'::jsonb,
+  source_adapters jsonb not null default '[]'::jsonb,
+  guardrails jsonb not null default '[]'::jsonb,
+  payload jsonb not null default '{}'::jsonb,
+  created_at timestamptz not null default now()
+);
+
+create table if not exists trend_signals (
+  id text primary key,
+  run_id text not null references trend_research_runs(id),
+  campaign_id text not null,
+  campaign_name text not null,
+  topic text not null,
+  angle text not null,
+  platforms jsonb not null default '[]'::jsonb,
+  source_urls jsonb not null default '[]'::jsonb,
+  evidence jsonb not null default '[]'::jsonb,
+  verification jsonb not null default '{}'::jsonb,
+  score integer not null default 0,
+  reel_hooks jsonb not null default '[]'::jsonb,
+  format_suggestions jsonb not null default '[]'::jsonb,
+  creative_notes jsonb not null default '[]'::jsonb,
+  hashtags jsonb not null default '[]'::jsonb,
+  created_at timestamptz not null default now()
+);
+
+create table if not exists reel_concepts (
+  id text primary key,
+  run_id text not null references trend_research_runs(id),
+  campaign_id text not null,
+  trend_id text not null,
+  status text not null default 'draft',
+  user_prompt text,
+  variants jsonb not null default '[]'::jsonb,
+  approved_variant_id text,
+  content_id text references content_briefs(id),
+  guardrails jsonb not null default '[]'::jsonb,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+
+create table if not exists learning_records (
+  id bigserial primary key,
+  event text not null,
+  content_id text references content_briefs(id),
+  campaign_id text,
+  trend_id text,
+  concept_id text references reel_concepts(id),
+  payload jsonb not null default '{}'::jsonb,
+  created_at timestamptz not null default now()
+);
+
 create table if not exists audit_log (
   id bigserial primary key,
   agent_id text not null,
@@ -130,4 +193,9 @@ create index if not exists idx_leads_campaign on lead_records(campaign);
 create index if not exists idx_leads_next_action on lead_records(next_action);
 create index if not exists idx_routing_outbox_source on routing_outbox(source_id);
 create index if not exists idx_routing_outbox_status on routing_outbox(status);
+create index if not exists idx_trend_signals_run on trend_signals(run_id);
+create index if not exists idx_trend_signals_campaign on trend_signals(campaign_id);
+create index if not exists idx_reel_concepts_run on reel_concepts(run_id);
+create index if not exists idx_reel_concepts_campaign on reel_concepts(campaign_id);
+create index if not exists idx_learning_content on learning_records(content_id);
 create index if not exists idx_audit_agent_action on audit_log(agent_id, action);

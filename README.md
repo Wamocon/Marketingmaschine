@@ -9,6 +9,7 @@ The original strategy documents define campaigns, audiences, and bot roles. The 
 - data contracts for briefs, approvals, leads, experiments, and KPI records
 - lead intake with consent guard, qualification scoring, and CRM/Mautic payload contracts
 - governed routing outbox for Postiz/Twenty/Mautic handoff with dry-run first
+- Trend Studio for 10-day public-source trend scans, campaign-aligned Instagram Reel concepts, topic-locked regeneration, and approval into the review workflow
 - local-model routing for private work
 - integration templates for n8n, Postiz/Metricool, Mautic/Twenty/HubSpot, ComfyUI, and MCP tools
 
@@ -24,6 +25,7 @@ Implemented now:
 - Routing outbox endpoints that prepare Postiz drafts and CRM lead handoff without live writes unless explicitly enabled.
 - Phase-readiness endpoint and UI tab that shows complete, partial, and blocked implementation phases.
 - KPI performance listing endpoint for recent optimization decisions.
+- Trend research and Reel concept endpoints with JSON persistence and UI wiring.
 - Database schema for the evidence vault, approvals, audits, experiments, leads, and performance data.
 - Deployment templates for core services and n8n workflows.
 - Runbooks for operations, testing cadence, and compliance.
@@ -113,6 +115,8 @@ http://192.168.178.75:18117/ui
 ```
 
 See `docs/end-user-workflow.md` for the two n8n pipelines and the simple browser procedure.
+
+Trend Studio is available in the same console. Configure at least one live source adapter (`SEARXNG_BASE_URL`, Google Programmable Search, Reddit OAuth, or TikTok Research API) before treating results as verified trends. See `docs/trend-studio.md`.
 
 ## Production Direction
 

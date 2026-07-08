@@ -3,6 +3,8 @@ runtime-data/
 deploy/*.generated.env
 *.pyc
 __pycache__/
+node_modules/
+test-results/
 
 # Local QA artifacts
 qa_output/

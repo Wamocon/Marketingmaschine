@@ -57,6 +57,11 @@ class ContentBrief:
     status: ContentStatus = ContentStatus.DRAFTING
     risk_flags: list[str] = field(default_factory=list)
     hashtags: list[str] = field(default_factory=list)
+    trend_id: str = ""
+    trend_summary: str = ""
+    trend_sources: list[str] = field(default_factory=list)
+    reel_concept: dict[str, Any] = field(default_factory=dict)
+    user_prompt: str = ""
     draft: str = ""
     public_copy: str = ""
     review_notes: list[str] = field(default_factory=list)

@@ -22,7 +22,10 @@ def generate_public_copy(brief: ContentBrief) -> GeneratedContent:
     channel = brief.channel.strip().lower()
     german = _is_german(brief)
     if channel == "instagram":
-        public_copy = _instagram_copy_de(brief) if german else _instagram_copy_en(brief)
+        if "reel" in brief.format.lower() or brief.reel_concept:
+            public_copy = _instagram_reel_copy_de(brief) if german else _instagram_reel_copy_en(brief)
+        else:
+            public_copy = _instagram_copy_de(brief) if german else _instagram_copy_en(brief)
     elif channel in {"email", "newsletter"}:
         public_copy = _email_copy_de(brief) if german else _email_copy_en(brief)
     else:
@@ -39,19 +42,15 @@ def _is_german(brief: ContentBrief) -> bool:
 
 def _review_notes_de(brief: ContentBrief) -> list[str]:
     return [
-        f"Nachweis vor Veröffentlichung prüfen: {', '.join(brief.proof_sources)}",
-        f"Nur eine Variable testen: {brief.test_variable}",
-        f"Mit UTM-Kampagne tracken: {brief.utm.get('utm_campaign', '')}",
-        "Vor Planung prüfen: Nachweis, Zustimmung, Markenfit, Datenschutz und KI-Kennzeichnung.",
+        "Vor dem Posten pruefen: Beleg, Zustimmung, Markenfit, Datenschutz und KI-Kennzeichnung.",
+        "Als Scheduler-Entwurf uebergeben; finale Plattformfreigabe bleibt Pflicht.",
     ]
 
 
 def _review_notes_en(brief: ContentBrief) -> list[str]:
     return [
-        f"Proof required before publishing: {', '.join(brief.proof_sources)}",
-        f"Test one variable only: {brief.test_variable}",
-        f"Track with UTM campaign: {brief.utm.get('utm_campaign', '')}",
-        "Human must verify proof, consent, brand fit, privacy, and AI disclosure before scheduling.",
+        "Before posting, check proof, consent, brand fit, privacy, and AI disclosure.",
+        "Send as a scheduler draft only; final platform approval is still required.",
     ]
 
 
@@ -96,6 +95,38 @@ Fokus:
 Nächster Schritt: {brief.cta}
 
 {tag_line}
+"""
+
+
+def _instagram_reel_copy_de(brief: ContentBrief) -> str:
+    concept = brief.reel_concept or {}
+    beats = concept.get("beats") if isinstance(concept.get("beats"), list) else []
+    shot_list = concept.get("shot_list") if isinstance(concept.get("shot_list"), list) else []
+    animation_notes = concept.get("animation_notes") or "Kinetic Captions, schnelle Schnitte, klare Untertitel."
+    caption = concept.get("caption") or _instagram_copy_de(brief)
+    hook = concept.get("hook") or _hook_for_de(brief)
+    return f"""Instagram-Reel-Entwurf
+
+Trend-Signal: {brief.trend_summary or brief.format}
+Format: {concept.get("format", brief.format)}
+
+Hook:
+{hook}
+
+Reel-Ablauf:
+{_numbered_lines(beats or ["Problem sichtbar machen", "1 konkreten Pruefpunkt zeigen", brief.cta])}
+
+Shotlist:
+{_numbered_lines(shot_list or ["Talking Head oder Bildschirmaufnahme", "kurzer Beweis-/Prozess-Screenshot ohne Kundendaten", "CTA-Endkarte"])}
+
+Animation / Schnitt:
+{animation_notes}
+
+Caption:
+{caption}
+
+CTA:
+{concept.get("cta", brief.cta)}
 """
 
 
@@ -176,6 +207,38 @@ CTA: {brief.cta}
 """
 
 
+def _instagram_reel_copy_en(brief: ContentBrief) -> str:
+    concept = brief.reel_concept or {}
+    beats = concept.get("beats") if isinstance(concept.get("beats"), list) else []
+    shot_list = concept.get("shot_list") if isinstance(concept.get("shot_list"), list) else []
+    animation_notes = concept.get("animation_notes") or "Kinetic captions, fast cuts, clear subtitles."
+    caption = concept.get("caption") or _instagram_copy_en(brief)
+    hook = concept.get("hook") or _hook_for_en(brief)
+    return f"""Instagram Reel draft
+
+Trend signal: {brief.trend_summary or brief.format}
+Format: {concept.get("format", brief.format)}
+
+Hook:
+{hook}
+
+Reel flow:
+{_numbered_lines(beats or ["Make the problem visible", "Show one concrete proof point", brief.cta])}
+
+Shot list:
+{_numbered_lines(shot_list or ["Talking head or screen recording", "short proof/process screenshot without customer data", "CTA end card"])}
+
+Animation / edit:
+{animation_notes}
+
+Caption:
+{caption}
+
+CTA:
+{concept.get("cta", brief.cta)}
+"""
+
+
 def _email_copy_en(brief: ContentBrief) -> str:
     return f"""Subject: {brief.cta}
 
@@ -207,3 +270,7 @@ def _hook_for_en(brief: ContentBrief) -> str:
     if "app" in campaign or "modernization" in campaign:
         return "Old internal apps rarely fail all at once. They slow teams down every week."
     return brief.objective.rstrip(".") + "."
+
+
+def _numbered_lines(items: list[str]) -> str:
+    return "\n".join(f"{index}. {item}" for index, item in enumerate(items, start=1))

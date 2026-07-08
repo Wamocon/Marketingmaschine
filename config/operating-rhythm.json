@@ -8,6 +8,11 @@
       "checks": ["comments", "new_leads", "failed_workflows", "trend_alerts"]
     },
     {
+      "name": "trend_studio_scan",
+      "interval": "every_day_or_before_batch_creation",
+      "checks": ["last_10_days_public_sources", "campaign_fit", "source_verification", "reel_format_candidates", "human_approval_queue"]
+    },
+    {
       "name": "early_signal_review",
       "interval": "72_hours_after_publish",
       "checks": ["saves", "comments", "profile_visits", "ctr", "landing_page_clicks"]

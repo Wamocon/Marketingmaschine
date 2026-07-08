@@ -301,19 +301,19 @@ def render_marketing_console() -> str:
 
     .hero-strip {
       display: grid;
-      grid-template-columns: minmax(280px, 1fr) minmax(340px, 520px);
+      grid-template-columns: minmax(360px, 1.6fr) minmax(260px, 0.55fr);
       gap: 14px;
       align-items: stretch;
     }
 
     .command-panel {
-      padding: 18px;
-      min-height: 152px;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
+      min-height: 286px;
+      display: grid;
+      grid-template-columns: minmax(260px, 0.95fr) minmax(260px, 0.85fr);
       overflow: hidden;
       position: relative;
+      isolation: isolate;
+      background: #fdfefe;
     }
 
     .command-panel::after {
@@ -326,12 +326,99 @@ def render_marketing_console() -> str:
     }
 
     .command-copy {
-      max-width: 840px;
+      max-width: 760px;
+      padding: 22px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 18px;
+      position: relative;
+      z-index: 2;
+    }
+
+    .hero-kicker {
+      color: var(--teal-dark);
+      font-weight: 800;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 8px;
+    }
+
+    .hero-title {
+      font-size: 30px;
+      line-height: 1.05;
+      max-width: 620px;
+      margin-bottom: 10px;
+    }
+
+    .hero-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .hero-visual {
+      min-height: 100%;
+      position: relative;
+      overflow: hidden;
+      border-left: 1px solid var(--line);
+      background: var(--surface-2);
+    }
+
+    .hero-visual img {
+      width: 100%;
+      height: 100%;
+      min-height: 286px;
+      object-fit: cover;
+      display: block;
+      transform: scale(1.02);
+      animation: heroDrift 9s ease-in-out infinite alternate;
+    }
+
+    .hero-visual::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(90deg, rgba(255,255,255,0.08), rgba(255,255,255,0));
+      pointer-events: none;
+    }
+
+    @keyframes heroDrift {
+      from { transform: scale(1.02) translateX(0); }
+      to { transform: scale(1.06) translateX(-8px); }
+    }
+
+    .operator-queue {
+      display: grid;
+      gap: 10px;
+      padding: 12px;
+    }
+
+    .queue-item {
+      min-height: 62px;
+      padding: 12px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius-sm);
+      background: var(--surface);
+      display: grid;
+      gap: 4px;
+      animation: enter 260ms ease both;
+    }
+
+    .queue-item small {
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .queue-item strong {
+      font-size: 18px;
+      line-height: 1;
     }
 
     .metric-grid {
       display: grid;
-      grid-template-columns: repeat(4, minmax(130px, 1fr));
+      grid-template-columns: 1fr;
       gap: 10px;
     }
 
@@ -769,6 +856,27 @@ def render_marketing_console() -> str:
       background: #0b1110;
     }
 
+    #trendRunResult,
+    #trendConceptResult,
+    #postPreview,
+    #approvalResult,
+    #schedulerPreview {
+      background: var(--surface-2);
+      color: var(--ink);
+      font-family: var(--sans);
+      font-size: 13px;
+      line-height: 1.62;
+    }
+
+    .theme-dark #trendRunResult,
+    .theme-dark #trendConceptResult,
+    .theme-dark #postPreview,
+    .theme-dark #approvalResult,
+    .theme-dark #schedulerPreview {
+      background: var(--surface-2);
+      color: var(--ink);
+    }
+
     .summary-box {
       padding: 12px 14px;
       border-bottom: 1px solid var(--line);
@@ -859,6 +967,44 @@ def render_marketing_console() -> str:
       font-size: 12px;
     }
 
+    .journey-board {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(170px, 1fr));
+      gap: 10px;
+      margin-top: 14px;
+    }
+
+    .journey-card {
+      min-height: 118px;
+      padding: 14px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--surface);
+      box-shadow: var(--soft-shadow);
+      position: relative;
+      overflow: hidden;
+      animation: enter 280ms ease both;
+    }
+
+    .journey-card::before {
+      content: "";
+      position: absolute;
+      inset: 0 auto 0 0;
+      width: 4px;
+      background: var(--teal);
+    }
+
+    .journey-card strong {
+      display: block;
+      margin-bottom: 6px;
+    }
+
+    .journey-card span {
+      color: var(--muted);
+      font-size: 12px;
+      display: block;
+    }
+
     .mobile-only {
       display: none;
     }
@@ -871,12 +1017,35 @@ def render_marketing_console() -> str:
       .sidebar {
         position: static;
         max-height: none;
+        order: 0;
+      }
+
+      .workspace {
+        order: -1;
       }
 
       .hero-strip,
       .form-grid,
       .wide-grid {
         grid-template-columns: 1fr;
+      }
+
+      .command-panel {
+        grid-template-columns: 1fr;
+      }
+
+      .hero-visual {
+        min-height: 220px;
+        border-left: 0;
+        border-top: 1px solid var(--line);
+      }
+
+      .hero-visual img {
+        object-position: 82% center;
+      }
+
+      .journey-board {
+        grid-template-columns: repeat(2, minmax(160px, 1fr));
       }
     }
 
@@ -949,7 +1118,8 @@ def render_marketing_console() -> str:
       .metric-grid,
       .field-grid,
       .checkbox-grid,
-      .guide {
+      .guide,
+      .journey-board {
         grid-template-columns: 1fr;
       }
 
@@ -983,10 +1153,10 @@ def render_marketing_console() -> str:
           <svg class="icon" viewBox="0 0 24 24"><path d="M12 3v2M12 19v2M4.2 4.2l1.4 1.4M18.4 18.4l1.4 1.4M3 12h2M19 12h2M4.2 19.8l1.4-1.4M18.4 5.6l1.4-1.4"/><circle cx="12" cy="12" r="4"/></svg>
           Theme
         </button>
-        <a class="btn btn-secondary" href="/docs" target="_blank" rel="noreferrer">
-          <svg class="icon" viewBox="0 0 24 24"><path d="M7 3h7l4 4v14H7z"/><path d="M14 3v5h5"/><path d="M9 13h6M9 17h6"/></svg>
-          API Docs
-        </a>
+        <button class="btn btn-secondary" type="button" data-jump="status">
+          <svg class="icon" viewBox="0 0 24 24"><path d="M12 20v-6"/><path d="M6 20V10"/><path d="M18 20V4"/></svg>
+          Setup
+        </button>
         <button class="btn btn-primary" type="button" id="weeklyPlanTop">
           <svg class="icon" viewBox="0 0 24 24"><path d="M4 5h16v16H4z"/><path d="M16 3v4M8 3v4M4 11h16"/></svg>
           Weekly Plan
@@ -1022,6 +1192,10 @@ def render_marketing_console() -> str:
               <button class="nav-tab" data-screen="phases" aria-selected="false">
                 <svg class="icon" viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
                 <span class="tab-copy"><strong>Phases</strong><span>Readiness</span></span>
+              </button>
+              <button class="nav-tab" data-screen="trends" aria-selected="false">
+                <svg class="icon" viewBox="0 0 24 24"><path d="M3 17l6-6 4 4 8-8"/><path d="M14 7h7v7"/></svg>
+                <span class="tab-copy"><strong>Trends</strong><span>Reel studio</span></span>
               </button>
               <button class="nav-tab" data-screen="intake" aria-selected="false">
                 <svg class="icon" viewBox="0 0 24 24"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
@@ -1092,28 +1266,39 @@ def render_marketing_console() -> str:
         <div class="hero-strip">
           <div class="panel command-panel">
             <div class="command-copy">
-              <h2 id="screenTitle">Dashboard</h2>
-              <p class="subtle" id="screenDescription">A practical command center for creating, approving, and improving WAMOCON marketing campaigns.</p>
+              <div>
+                <div class="hero-kicker">Content workflow</div>
+                <h2 class="hero-title" id="screenTitle">Plan better Reels faster</h2>
+                <p class="subtle" id="screenDescription">Pick a campaign, find a useful trend, create Reel options, approve the best draft.</p>
+              </div>
+              <div class="hero-actions">
+                <button class="btn btn-primary" type="button" data-jump="trends">Start Trend Scan</button>
+                <button class="btn btn-secondary" type="button" data-jump="approval">Review Drafts</button>
+              </div>
+              <div class="status-row" id="healthPills">
+                <span class="pill warn">Checking setup</span>
+              </div>
             </div>
-            <div class="status-row" id="healthPills">
-              <span class="pill warn">Loading</span>
+            <div class="hero-visual" aria-hidden="true">
+              <img src="/static/marketing-workflow-hero.png" alt="">
             </div>
           </div>
-          <div class="metric-grid" id="metricGrid">
-            <div class="metric"><small>Required services</small><strong id="metricRequired">...</strong><span>n8n, ComfyUI, local model</span></div>
-            <div class="metric"><small>Recent items</small><strong id="metricRecent">...</strong><span>stored content states</span></div>
-            <div class="metric"><small>Review queue</small><strong id="metricReview">...</strong><span>human review needed</span></div>
-            <div class="metric"><small>Guardrail</small><strong id="metricGuard">On</strong><span>no auto-publish</span></div>
+          <div class="panel operator-queue" id="metricGrid">
+            <div class="queue-item"><small>Setup</small><strong id="metricRequired">...</strong><span class="subtle">sources and model</span></div>
+            <div class="queue-item"><small>Content</small><strong id="metricRecent">...</strong><span class="subtle">drafts saved</span></div>
+            <div class="queue-item"><small>Needs review</small><strong id="metricReview">...</strong><span class="subtle">waiting for approval</span></div>
+            <div class="queue-item"><small>Publishing safety</small><strong id="metricGuard">On</strong><span class="subtle">manual approval</span></div>
           </div>
         </div>
 
-        <section class="screen active" id="screen-dashboard" data-title="Dashboard" data-description="A practical command center for creating, approving, and improving WAMOCON marketing campaigns.">
+        <section class="screen active" id="screen-dashboard" data-title="Dashboard" data-description="Pick a campaign, find a useful trend, create Reel options, approve the best draft.">
           <div class="screen-head">
             <div>
               <h2>Today</h2>
-              <p>Start with intake, then approval, then analytics. The system stays draft-only until a human publishes in the platform.</p>
+              <p>Choose one next step. The system keeps posts as drafts until you approve them.</p>
             </div>
             <div class="quick-actions">
+              <button class="btn btn-primary" type="button" data-jump="trends">Trend Scan</button>
               <button class="btn btn-primary" type="button" data-jump="intake">New Brief</button>
               <button class="btn btn-secondary" type="button" data-jump="approval">Approve Draft</button>
               <button class="btn btn-secondary" type="button" data-jump="leads">Add Lead</button>
@@ -1121,10 +1306,11 @@ def render_marketing_console() -> str:
               <button class="btn btn-secondary" type="button" data-jump="analytics">Review KPIs</button>
             </div>
           </div>
-          <div class="guide">
-            <div class="guide-item"><strong>Campaign input</strong><span>Use presets for QA, private AI, and app modernization. Custom briefs are supported.</span></div>
-            <div class="guide-item"><strong>Approval quality</strong><span>Brand score must be at least 90 and all checks must pass before scheduler draft creation.</span></div>
-            <div class="guide-item"><strong>Learning loop</strong><span>Use 72h, 7d, 14d, and 30d reviews to decide iterate, fix, stop, or scale.</span></div>
+          <div class="journey-board">
+            <button class="journey-card" type="button" data-jump="trends"><strong>1. Find Reel Trends</strong><span>Scan current sources and pick a campaign-ready idea.</span></button>
+            <button class="journey-card" type="button" data-jump="trends"><strong>2. Create Reel Options</strong><span>Generate hooks, shot lists, captions, and CTA ideas.</span></button>
+            <button class="journey-card" type="button" data-jump="approval"><strong>3. Review Draft</strong><span>Check proof, privacy, brand fit, and AI disclosure.</span></button>
+            <button class="journey-card" type="button" data-jump="routing"><strong>4. Send To Scheduler</strong><span>Prepare a draft-only handoff after approval.</span></button>
           </div>
           <div class="panel" style="margin-top:14px">
             <div class="panel-header">
@@ -1136,6 +1322,68 @@ def render_marketing_console() -> str:
                 <thead><tr><th>Content</th><th>Campaign</th><th>Status</th><th>Next</th></tr></thead>
                 <tbody id="recentTableBody"><tr><td colspan="4">Loading...</td></tr></tbody>
               </table>
+            </div>
+          </div>
+        </section>
+
+        <section class="screen" id="screen-trends" data-title="Trend Studio" data-description="Find current ideas, turn them into Reel drafts, and send the best one to review.">
+          <div class="screen-head">
+            <div>
+              <h2>Trend Studio</h2>
+              <p>Scan current sources, choose a trend, then create Reel ideas for the selected campaign.</p>
+            </div>
+            <div class="quick-actions">
+              <button class="btn btn-primary" type="button" id="runTrendScan">Find Trends</button>
+              <button class="btn btn-secondary" type="button" id="refreshTrendRuns">Saved Scans</button>
+            </div>
+          </div>
+          <div class="wide-grid">
+            <div class="panel">
+              <div class="panel-body">
+                <h3>What should we scan?</h3>
+                <div class="field-grid">
+                  <div><label for="trendLookback">Recent days</label><input id="trendLookback" type="number" min="1" max="30" value="10"></div>
+                  <div><label for="trendLimit">Ideas per campaign</label><input id="trendLimit" type="number" min="1" max="8" value="4"></div>
+                  <div><label for="trendVariantCount">Reel options</label><input id="trendVariantCount" type="number" min="1" max="6" value="4"></div>
+                </div>
+                <div class="checkbox-grid" id="trendPlatforms">
+                  <label><input type="checkbox" value="instagram" checked> Instagram Reels</label>
+                  <label><input type="checkbox" value="tiktok" checked> TikTok</label>
+                  <label><input type="checkbox" value="reddit" checked> Reddit</label>
+                  <label><input type="checkbox" value="forums" checked> Forums</label>
+                  <label><input type="checkbox" value="web" checked> Web / Google</label>
+                </div>
+                <label for="trendUserPrompt">Direction for the Reel</label>
+                <textarea id="trendUserPrompt" placeholder="Beispiel: mehr Q&A, visueller, direkter fuer Instagram."></textarea>
+              </div>
+            </div>
+            <div class="panel result-panel">
+              <div class="result-toolbar">
+                <h3>Scan Result</h3>
+                <button class="btn btn-secondary" type="button" data-copy="trendRunResult">Copy</button>
+              </div>
+              <div class="summary-box" id="trendRunSummary"><span class="pill neutral">No scan yet</span></div>
+              <pre id="trendRunResult">Click Find Trends to get campaign ideas.</pre>
+            </div>
+          </div>
+          <div class="wide-grid" style="margin-top:14px">
+            <div class="panel">
+              <div class="panel-header"><h3>Campaign Ideas</h3><span class="pill neutral" id="trendSelectedPill">Select idea</span></div>
+              <div class="panel-body">
+                <div class="recent-list" id="trendCampaigns"><span class="pill neutral">No ideas loaded</span></div>
+              </div>
+            </div>
+            <div class="panel result-panel">
+              <div class="result-toolbar">
+                <h3>Reel Ideas</h3>
+                <div class="quick-actions">
+                  <button class="btn btn-secondary" type="button" id="generateTrendConcept">Create Ideas</button>
+                  <button class="btn btn-secondary" type="button" id="approveTrendConcept">Send First To Review</button>
+                  <button class="btn btn-secondary" type="button" data-copy="trendConceptResult">Copy</button>
+                </div>
+              </div>
+              <div class="summary-box" id="trendConceptSummary"><span class="pill neutral">Select an idea first</span></div>
+              <pre id="trendConceptResult">Choose a campaign idea, then create Reel options.</pre>
             </div>
           </div>
         </section>
@@ -1191,6 +1439,8 @@ def render_marketing_console() -> str:
                   <select id="preset">
                     <option value="k1">K1 QA Risk Audit</option>
                     <option value="k2">K2 Private AI Discovery</option>
+                    <option value="k3">K3 LFA Azubi Reel</option>
+                    <option value="k4">K4 Mitarbeiter Reel</option>
                     <option value="k5">K5 App Modernization</option>
                     <option value="custom">Custom</option>
                   </select>
@@ -1225,6 +1475,7 @@ def render_marketing_console() -> str:
                       <select id="format" name="format">
                         <option value="expert_post">Expert post</option>
                         <option value="carousel">Carousel</option>
+                        <option value="reel">Reel</option>
                         <option value="video_script">Video script</option>
                         <option value="app_demo_post">App demo post</option>
                         <option value="email">Email</option>
@@ -1705,6 +1956,38 @@ def render_marketing_console() -> str:
         utm_medium: "organic",
         utm_campaign: "k2_private_ai_discovery"
       },
+      k3: {
+        idPrefix: "k3-lfa-azubi",
+        campaign: "K3 LFA Azubi",
+        persona: "Azubi, Ausbilder oder HR-Verantwortliche",
+        channel: "Instagram",
+        format: "reel",
+        language: "de-DE",
+        objective: "LFA und moderne Fachinformatiker-Ausbildung mit authentischen Einblicken positionieren.",
+        cta: "LFA-Demo oder Ausbildungsplatz-Info anfragen",
+        proof_sources: "Kampagnen/kampagne_3_lfa_azubis.json",
+        hypothesis: "Authentische LFA-Reels erzeugen Saves, Profilbesuche und qualifizierte Ausbildungs-/B2B-Anfragen.",
+        test_variable: "format",
+        utm_source: "instagram",
+        utm_medium: "organic_reel",
+        utm_campaign: "k3_lfa_azubi"
+      },
+      k4: {
+        idPrefix: "k4-employee-brand",
+        campaign: "K4 Mitarbeiter",
+        persona: "Bewerber und B2B-Entscheider",
+        channel: "Instagram",
+        format: "reel",
+        language: "de-DE",
+        objective: "WAMOCON-Team, Kultur und Consulting-Vertrauen durch menschliche Einblicke sichtbar machen.",
+        cta: "Team kennenlernen",
+        proof_sources: "Kampagnen/kampagne_4_mitarbeiter.json",
+        hypothesis: "Mitarbeiternahe Reels bauen Vertrauen fuer Recruiting und Consulting-Anfragen auf.",
+        test_variable: "story_angle",
+        utm_source: "instagram",
+        utm_medium: "organic_reel",
+        utm_campaign: "k4_employee_brand"
+      },
       k5: {
         idPrefix: "k5-app-modernization",
         campaign: "K5 App Development",
@@ -1727,6 +2010,9 @@ def render_marketing_console() -> str:
     let recentLeads = [];
     let recentOutbox = [];
     let phaseItems = [];
+    let activeTrendRun = null;
+    let activeTrendSelection = null;
+    let activeTrendConcept = null;
     let lastResult = {};
     let currentUiLanguage = "de";
     const $ = (id) => document.getElementById(id);
@@ -1757,6 +2043,8 @@ def render_marketing_console() -> str:
       ["Overview", "Überblick"],
       ["Phases", "Phasen"],
       ["Readiness", "Bereitschaft"],
+      ["Trends", "Trends"],
+      ["Reel studio", "Reel-Studio"],
       ["Create brief", "Briefing erstellen"],
       ["Approval", "Freigabe"],
       ["Review gate", "Prüfschritt"],
@@ -1785,6 +2073,32 @@ def render_marketing_console() -> str:
       ["On", "An"],
       ["no auto-publish", "kein Auto-Publishing"],
       ["Today", "Heute"],
+      ["Content workflow", "Content-Ablauf"],
+      ["Plan better Reels faster", "Reels schneller planen"],
+      ["Pick a campaign, find a useful trend, create Reel options, approve the best draft.", "Kampagne waehlen, Trend finden, Reel-Optionen erstellen und den besten Entwurf freigeben."],
+      ["Start Trend Scan", "Trend-Scan starten"],
+      ["Review Drafts", "Entwuerfe pruefen"],
+      ["Checking setup", "Setup wird geprueft"],
+      ["sources and model", "Quellen und Modell"],
+      ["drafts saved", "Entwuerfe gespeichert"],
+      ["Needs review", "Zu pruefen"],
+      ["waiting for approval", "wartet auf Freigabe"],
+      ["Publishing safety", "Publishing-Schutz"],
+      ["manual approval", "manuelle Freigabe"],
+      ["Choose one next step. The system keeps posts as drafts until you approve them.", "Waehle den naechsten Schritt. Beitraege bleiben Entwuerfe, bis du sie freigibst."],
+      ["Trend Scan", "Trend-Scan"],
+      ["Find Reel Trends", "Reel-Trends finden"],
+      ["Create Reel Options", "Reel-Optionen erstellen"],
+      ["Review Draft", "Entwurf pruefen"],
+      ["Send To Scheduler", "An Scheduler geben"],
+      ["1. Find Reel Trends", "1. Reel-Trends finden"],
+      ["2. Create Reel Options", "2. Reel-Optionen erstellen"],
+      ["3. Review Draft", "3. Entwurf pruefen"],
+      ["4. Send To Scheduler", "4. An Scheduler geben"],
+      ["Scan current sources and pick a campaign-ready idea.", "Aktuelle Quellen scannen und eine passende Kampagnenidee waehlen."],
+      ["Generate hooks, shot lists, captions, and CTA ideas.", "Hooks, Shotlists, Captions und CTA-Ideen erzeugen."],
+      ["Check proof, privacy, brand fit, and AI disclosure.", "Belege, Datenschutz, Markenfit und AI-Kennzeichnung pruefen."],
+      ["Prepare a draft-only handoff after approval.", "Nach Freigabe einen reinen Entwurf vorbereiten."],
       ["Start with intake, then approval, then analytics. The system stays draft-only until a human publishes in the platform.", "Beginne mit Eingabe, dann Freigabe, dann Analyse. Das System bleibt im Entwurfsmodus, bis ein Mensch auf der Plattform veröffentlicht."],
       ["New Brief", "Neues Briefing"],
       ["Approve Draft", "Entwurf freigeben"],
@@ -1972,6 +2286,7 @@ def render_marketing_console() -> str:
       ["placeholder", "qualified lead ID", "qualifizierte Lead-ID"],
       ["placeholder", "approved screenshot, consent ref, app proof", "freigegebener Screenshot, Consent-Ref, App-Beleg"],
       ["data-title", "Dashboard", "Übersicht"],
+      ["data-title", "Trend Studio", "Trend Studio"],
       ["data-title", "Phase Readiness", "Phasenbereitschaft"],
       ["data-title", "Manual Content Intake", "Manuelle Content-Eingabe"],
       ["data-title", "Human Approval", "Menschliche Freigabe"],
@@ -1981,6 +2296,8 @@ def render_marketing_console() -> str:
       ["data-title", "Creative Brief", "Kreativbriefing"],
       ["data-title", "System Status", "Systemstatus"],
       ["data-description", "A practical command center for creating, approving, and improving WAMOCON marketing campaigns.", "Eine praktische Steuerzentrale zum Erstellen, Freigeben und Verbessern von WAMOCON-Marketingkampagnen."],
+      ["data-description", "Pick a campaign, find a useful trend, create Reel options, approve the best draft.", "Kampagne waehlen, Trend finden, Reel-Optionen erstellen und den besten Entwurf freigeben."],
+      ["data-description", "Find current ideas, turn them into Reel drafts, and send the best one to review.", "Aktuelle Ideen finden, Reel-Entwuerfe erzeugen und den besten Entwurf zur Pruefung geben."],
       ["data-description", "See which implementation phases are finished, partial, or blocked before running campaigns.", "Sieh, welche Umsetzungsphasen fertig, teilweise fertig oder blockiert sind, bevor Kampagnen laufen."],
       ["data-description", "Create a campaign brief with proof, CTA, UTM tracking, and a test hypothesis.", "Erstelle ein Kampagnenbriefing mit Beleg, CTA, UTM-Tracking und Testhypothese."],
       ["data-description", "Approve only after checking the draft, proof source, privacy, consent, and AI disclosure.", "Nur freigeben, nachdem Entwurf, Belegquelle, Datenschutz, Einwilligung und AI-Kennzeichnung geprüft wurden."],
@@ -2362,13 +2679,169 @@ def render_marketing_console() -> str:
       showToast(`${t("selected")} ${contentId}`);
       try {
         const state = await getJson(`/workflows/states/${encodeURIComponent(contentId)}`);
-        setJson("approvalResult", state);
+        renderApprovalResult(state);
         renderApprovalSummary(state);
         renderPostPreview(state);
         renderSchedulerPreview(state);
       } catch (error) {
         setJson("approvalResult", String(error.message || error));
       }
+    }
+
+    function selectedTrendPlatforms() {
+      return Array.from(document.querySelectorAll("#trendPlatforms input:checked")).map((node) => node.value);
+    }
+
+    function trendScanPayload() {
+      return {
+        lookback_days: intValue("trendLookback") || 10,
+        limit_per_campaign: intValue("trendLimit") || 4,
+        platforms: selectedTrendPlatforms()
+      };
+    }
+
+    function renderTrendRun(data) {
+      const run = data.trend_run || data;
+      activeTrendRun = run;
+      activeTrendSelection = null;
+      activeTrendConcept = null;
+      const campaignCount = (run.campaigns || []).length;
+      const trendCount = (run.campaigns || []).reduce((sum, item) => sum + ((item.trends || []).length), 0);
+      const hasSources = (run.source_adapters || []).length > 0;
+      $("trendRunSummary").innerHTML = [
+        iconPill(run.status === "verified_sources" ? "Live sources ready" : "Connect live sources", run.status === "verified_sources" ? "ok" : "warn"),
+        iconPill(`${campaignCount} campaigns`, "neutral"),
+        iconPill(`${trendCount} ideas`, "neutral"),
+        iconPill(hasSources ? "real source scan" : "demo scan", hasSources ? "ok" : "warn")
+      ].join("");
+      $("trendRunResult").textContent = [
+        `Scan ID: ${run.id || ""}`,
+        `Status: ${run.status === "verified_sources" ? "Live source scan ready" : "Demo mode until source keys are connected"}`,
+        `Campaigns checked: ${campaignCount}`,
+        `Ideas found: ${trendCount}`,
+        `Sources: ${hasSources ? run.source_adapters.join(", ") : "No live source keys connected yet"}`,
+        "",
+        hasSources ? "You can use these ideas as current trend signals after review." : "You can test the workflow now. Add search/social keys for real latest trend results."
+      ].join("\\n");
+      $("trendConceptSummary").innerHTML = iconPill("Select idea", "neutral");
+      $("trendConceptResult").textContent = "Choose a campaign idea, then create Reel options.";
+      $("trendSelectedPill").textContent = "Select idea";
+      $("trendCampaigns").innerHTML = (run.campaigns || []).map((item) => {
+        const campaign = item.campaign || {};
+        const rows = (item.trends || []).map((trend) => {
+          const verification = trend.verification || {};
+          const mode = verification.status === "verified_recent" ? "ok" : verification.status === "requires_live_sources" ? "bad" : "warn";
+          return `
+            <button type="button" class="recent-item trend-item" data-campaign-id="${escapeHtml(campaign.id || "")}" data-trend-id="${escapeHtml(trend.id || "")}">
+              <strong>${escapeHtml(trend.topic || "Trend")}</strong>
+              <span>${escapeHtml(campaign.name || "")} | ${escapeHtml(statusLabel(verification.status || ""))} | score ${escapeHtml(String(trend.score || 0))}</span>
+            </button>
+          `;
+        }).join("");
+        return `<div class="stack"><h3>${escapeHtml(campaign.name || "Campaign")}</h3>${rows || `<span class="pill warn">No ideas</span>`}</div>`;
+      }).join("") || `<span class="pill warn">No ideas loaded</span>`;
+      document.querySelectorAll(".trend-item").forEach((button) => {
+        button.addEventListener("click", () => selectTrend(button.dataset.campaignId, button.dataset.trendId));
+      });
+    }
+
+    function selectTrend(campaignId, trendId) {
+      if (!activeTrendRun) return;
+      const campaignItem = (activeTrendRun.campaigns || []).find((item) => item.campaign?.id === campaignId);
+      const trend = (campaignItem?.trends || []).find((item) => item.id === trendId);
+      if (!campaignItem || !trend) return;
+      activeTrendSelection = {campaignId, trendId, campaign: campaignItem.campaign, trend};
+      activeTrendConcept = null;
+      const verification = trend.verification || {};
+      $("trendSelectedPill").textContent = trend.topic || "Trend";
+      $("trendConceptSummary").innerHTML = [
+        iconPill(campaignItem.campaign?.name || "Campaign", "neutral"),
+        iconPill(statusLabel(verification.status || "status"), verification.status === "verified_recent" ? "ok" : "warn"),
+        iconPill(`${verification.evidence_count || 0} sources`, verification.evidence_count >= 2 ? "ok" : "warn")
+      ].join("");
+      $("trendConceptResult").textContent = [
+        `Selected idea: ${trend.topic || ""}`,
+        `Campaign: ${campaignItem.campaign?.name || ""}`,
+        `Why it fits: ${trend.campaign_fit || ""}`,
+        `Source status: ${verification.status === "verified_recent" ? "recent sources found" : verification.note || verification.status || "review needed"}`,
+        "",
+        "Suggested Reel angles:",
+        ...(trend.format_suggestions || []).slice(0, 4).map((format) => `- ${format}`),
+        "",
+        "Next: click Create Ideas."
+      ].join("\\n");
+    }
+
+    function renderConceptResult(concept) {
+      const variants = concept.variants || [];
+      $("trendConceptResult").textContent = [
+        `Reel idea bundle: ${concept.id || ""}`,
+        `Campaign: ${concept.campaign?.name || ""}`,
+        `Selected trend: ${concept.trend?.topic || ""}`,
+        "",
+        "Best options:",
+        ...variants.map((variant, index) => [
+          `${index + 1}. ${variant.format || "Reel option"}`,
+          `   Hook: ${variant.hook || ""}`,
+          `   CTA: ${variant.cta || ""}`,
+          `   Edit style: ${variant.animation_notes || ""}`,
+        ].join("\\n")),
+        "",
+        "Next: Send First To Review, or adjust the direction and Create Ideas again."
+      ].join("\\n");
+    }
+
+    async function generateTrendConceptBundle() {
+      if (!activeTrendRun || !activeTrendSelection) {
+        $("trendConceptSummary").innerHTML = iconPill("Select trend first", "warn");
+        return;
+      }
+      const data = await postJson("/workflows/reel-concepts", {
+        run_id: activeTrendRun.id,
+        campaign_id: activeTrendSelection.campaignId,
+        trend_id: activeTrendSelection.trendId,
+        user_prompt: $("trendUserPrompt").value.trim(),
+        variant_count: intValue("trendVariantCount") || 4
+      });
+      activeTrendConcept = data.concept;
+      $("trendConceptSummary").innerHTML = [
+        iconPill("Concept created", "ok"),
+        iconPill(`${activeTrendConcept.variants.length} variants`, "neutral"),
+        iconPill(activeTrendConcept.status || "draft", "warn")
+      ].join("");
+      renderConceptResult(activeTrendConcept);
+    }
+
+    async function approveActiveTrendConcept() {
+      if (!activeTrendConcept) {
+        $("trendConceptSummary").innerHTML = iconPill("Generate concept first", "warn");
+        return;
+      }
+      const firstVariant = activeTrendConcept.variants?.[0] || {};
+      const data = await postJson(`/workflows/reel-concepts/${encodeURIComponent(activeTrendConcept.id)}/approve`, {
+        variant_id: firstVariant.id || ""
+      });
+      $("approvalContentId").value = data.content_id || "";
+      $("analyticsContentId").value = data.content_id || "";
+      $("leadSourceContentId").value = data.content_id || "";
+      $("routeContentId").value = data.content_id || "";
+      $("trendConceptSummary").innerHTML = [
+        iconPill("Approved to review", "ok"),
+        iconPill(data.content_id || "content", "neutral"),
+        iconPill(statusLabel(data.state?.brief?.status || ""), "warn")
+      ].join("");
+      $("trendConceptResult").textContent = [
+        `Sent to review: ${data.content_id || ""}`,
+        `Status: ${statusLabel(data.state?.brief?.status || "")}`,
+        "",
+        "Open the Approval screen to check proof, brand fit, privacy, and AI disclosure."
+      ].join("\\n");
+      renderApprovalResult(data);
+      renderApprovalSummary(data);
+      renderPostPreview(data);
+      renderSchedulerPreview(data);
+      await refreshRecent();
+      setScreen("approval");
     }
 
     function renderApprovalSummary(data) {
@@ -2381,6 +2854,38 @@ def render_marketing_console() -> str:
         iconPill(statusLabel(nextStep), nextStep === "scheduler" ? "ok" : "neutral"),
         iconPill(statusLabel(scheduler), scheduler.includes("draft") ? "warn" : "neutral")
       ].join("");
+    }
+
+    function renderApprovalResult(data) {
+      const state = data.state || data;
+      const brief = state.brief || {};
+      const concept = brief.reel_concept || {};
+      const approval = state.approval || {};
+      const errors = state.errors || [];
+      const proofCount = (brief.proof_sources || []).length;
+      const label = (de, en) => currentUiLanguage === "de" ? de : en;
+      const checkLines = [
+        approval.fact_check_passed ? label("- Faktencheck bestanden", "- Fact check passed") : "",
+        approval.privacy_check_passed ? label("- Datenschutz geprueft", "- Privacy checked") : "",
+        approval.ai_disclosure_check_passed ? label("- AI-Kennzeichnung geprueft", "- AI disclosure checked") : ""
+      ].filter(Boolean);
+      $("approvalResult").textContent = [
+        `${label("Status", "Status")}: ${statusLabel(brief.status || "unknown")}`,
+        `${label("Naechster Schritt", "Next step")}: ${statusLabel(state.next_step || "unknown")}`,
+        `${label("Kampagne", "Campaign")}: ${brief.campaign || ""}`,
+        concept.format ? `${label("Reel-Format", "Reel format")}: ${concept.format}` : "",
+        concept.hook ? `${label("Hook", "Hook")}: ${concept.hook}` : "",
+        brief.cta ? `${label("CTA", "CTA")}: ${brief.cta}` : "",
+        "",
+        errors.length ? label("Bitte klaeren:", "Needs attention:") : label("Freigabecheck:", "Approval check:"),
+        ...(errors.length ? errors.map((error) => `- ${statusLabel(error)}`) : [
+          label("- Bereit fuer den naechsten Schritt.", "- Ready for the next step."),
+          proofCount ? label(`- ${proofCount} Belegquelle(n) hinterlegt.`, `- ${proofCount} proof source(s) attached.`) : "",
+          ...checkLines
+        ].filter(Boolean)),
+        "",
+        `${label("Entwurf", "Draft")}: ${brief.id || data.content_id || ""}`
+      ].filter((line) => line !== "").join("\\n");
     }
 
     function postCopyFrom(data) {
@@ -2630,6 +3135,44 @@ def render_marketing_console() -> str:
     $("refreshRecent").addEventListener("click", () => refreshRecent().then(() => showToast(t("recentContentRefreshed"))));
     $("refreshStatus").addEventListener("click", () => refreshStatus().then(() => showToast(t("statusRefreshed"))));
     $("refreshPhases").addEventListener("click", () => refreshPhaseStatus().then(() => showToast(t("phasesRefreshed"))));
+    $("runTrendScan").addEventListener("click", async () => {
+      try {
+        $("trendRunSummary").innerHTML = iconPill("Scanning", "warn");
+        const data = await postJson("/workflows/trend-research", trendScanPayload());
+        renderTrendRun(data);
+        showToast("Trend scan finished");
+      } catch (error) {
+        $("trendRunSummary").innerHTML = iconPill("Trend scan failed", "bad");
+        setJson("trendRunResult", String(error.message || error));
+      }
+    });
+    $("refreshTrendRuns").addEventListener("click", async () => {
+      try {
+        const data = await getJson("/workflows/trend-research/runs?limit=10");
+        setJson("trendRunResult", data);
+        $("trendRunSummary").innerHTML = iconPill(`${(data.items || []).length} saved runs`, "neutral");
+      } catch (error) {
+        setJson("trendRunResult", String(error.message || error));
+      }
+    });
+    $("generateTrendConcept").addEventListener("click", async () => {
+      try {
+        await generateTrendConceptBundle();
+        showToast("Reel concepts generated");
+      } catch (error) {
+        $("trendConceptSummary").innerHTML = iconPill("Concept blocked", "bad");
+        setJson("trendConceptResult", String(error.message || error));
+      }
+    });
+    $("approveTrendConcept").addEventListener("click", async () => {
+      try {
+        await approveActiveTrendConcept();
+        showToast("Concept approved into review queue");
+      } catch (error) {
+        $("trendConceptSummary").innerHTML = iconPill("Approval failed", "bad");
+        setJson("trendConceptResult", String(error.message || error));
+      }
+    });
       $("weeklyPlanTop").addEventListener("click", async () => {
       const data = await postJson("/workflows/weekly-planning", {calendar_mode: "rolling_30_day"});
       setJson("intakeResult", data);
@@ -2678,7 +3221,7 @@ def render_marketing_console() -> str:
         const data = await postJson("/workflows/approve-content", approvalPayload());
         renderApprovalSummary(data);
         renderSchedulerPreview(data);
-        setJson("approvalResult", data);
+        renderApprovalResult(data);
         await refreshRecent();
         showToast(data.state?.next_step === "scheduler" ? t("approvalApplied") : t("revisionRequired"));
       } catch (error) {
@@ -2695,7 +3238,7 @@ def render_marketing_console() -> str:
         renderApprovalSummary(state);
         renderPostPreview(state);
         renderSchedulerPreview(state);
-        setJson("approvalResult", state);
+        renderApprovalResult(state);
       } catch (error) {
         setJson("approvalResult", String(error.message || error));
       }
