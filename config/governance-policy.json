@@ -46,8 +46,22 @@
     "(?i)(api[_-]?key|secret|password|token)\\s*[:=]",
     "(?i)(guaranteed|garantiert)\\s+(roi|results|umsatz|conversion)",
     "(?i)(100%|one hundred percent)\\s+(safe|secure|compliant|guaranteed)",
+    "(?i)\\b(niemals|immer|vollständig|garantiert)\\b.{0,50}\\b(daten|sicher|sicherheit|compliance|risiko|schutz)\\b",
+    "(?i)\\b(maximal(?:e|er|en|em)?|höchst(?:e|er|en|em)?|absolute[nrms]?|voll(?:e|er|en|em)?)\\s+(datensouveränität|datensicherheit|sicherheit|compliance|kontrolle)\\b",
+    "(?i)\\b(keine|ohne)\\s+(?:sensiblen?\\s+)?(?:daten|abflüsse?|datenabflüsse?|risiken?|kompromisse)\\b",
+    "(?i)\\b(?:ihre|die|sensible[nr]?)\\s+daten\\s+(?:verbleiben|bleiben)\\s+(?:vollständig\\s+)?(?:bei|in|unter)\\b",
+    "(?i)\\bohne\\s+(?:auf\\s+)?externe\\s+(?:cloud|cloud-dienste|dienste)\\b",
+    "(?i)\\b(?:anforderungen|vorgaben)\\s+(?:an|der)\\s+(?:datenschutz|dsgvo|compliance).{0,30}\\b(?:gerecht|erfüllt|konform)\\b",
+    "(?i)\\bohne\\s+(?:ihre|die)\\s+(?:datenhoheit|datensouveränität)\\s+aufzugeben\\b",
+    "(?i)\\b(roi|return on investment)\\b",
     "(?i)(scrape|crawl).*linkedin.*(login|private|session)",
     "(?i)(customer|kunde|employee|mitarbeiter|applicant|bewerber).*without consent",
+    "(?i)\\b(minor|child|underage|minderj[aä]hrig(?:e[snm]?)?|kind)\\b.{0,80}\\b(nude|nudity|sexual|intimate|nackt|sexuell|intim)\\b",
+    "(?i)\\b(nude|nudity|sexual|intimate|nackt|sexuell|intim)\\b.{0,80}\\b(minor|child|underage|minderj[aä]hrig(?:e[snm]?)?|kind)\\b",
+    "(?i)\\b(non[- ]?consensual|without consent|ohne einwilligung)\\b.{0,80}\\b(nude|nudity|sexual|intimate|nackt|sexuell|intim)\\b",
+    "(?i)\\b(doxx|doxxing|private address|private phone|privatadresse|private telefonnummer)\\b",
+    "(?i)\\b(impersonate|deepfake|fabricate|fälsch(?:e|en)|erfinde)\\b.{0,80}\\b(customer|employee|executive|evidence|proof|quote|testimonial|kunde|mitarbeiter|geschäftsführer|beleg|zitat|referenz)\\b",
+    "(?i)\\b(coordinated deception|mass disinformation|gezielte desinformation|massenhafte täuschung)\\b",
     "(?i)(drop|truncate|delete from)\\s+\\w+"
   ],
   "content_rules": {
@@ -58,6 +72,11 @@
     "instagram_hashtag_max": 5,
     "instagram_hashtag_recommended_min": 3,
     "auto_commenting_allowed": false,
-    "ai_generated_media_must_be_tracked": true
+    "ai_generated_media_must_be_tracked": true,
+    "generated_media_is_never_factual_evidence": true,
+    "block_sexual_content_involving_minors": true,
+    "block_nonconsensual_intimate_content": true,
+    "block_harassment_and_private_personal_data": true,
+    "block_impersonation_and_coordinated_deception": true
   }
 }

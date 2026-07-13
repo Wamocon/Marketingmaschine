@@ -39,6 +39,18 @@ Trend Studio separates trend provenance from publishable proof:
 
 Trend sources are internal review material. Public claims still require approved proof sources from the evidence vault and the existing approval checklist.
 
+## Manual and n8n Intake
+
+`POST /workflows/create-content` and the n8n manual-content webhook use an explicit content contract:
+
+- `content_mode: evergreen` creates campaign-led content with no trend run, trend ID, trend status, trend URLs, or trend citations attached; its generation inputs, including objective, instructions, CTA, format, and hashtags, must not request current/latest/trending claims.
+- `content_mode: current_trend` accepts only `trend_run_id` and `trend_id`. The API reloads that exact stored selection, checks the campaign match, freshness, two independent publisher domains, and a recent dated source, then reconstructs the summary, URLs, status, and citations itself.
+- Caller-supplied `trend_summary`, `trend_sources`, `trend_verification_status`, or `citations` are rejected in both modes.
+
+With `MARKETING_MACHINE_REQUIRE_EXPLICIT_CONTENT_MODE=true` (the production default), a direct API request that omits `content_mode` is blocked. The active n8n manual-intake workflow safely supplies `evergreen` when its inbound request omits the mode; the API still rejects current/latest/trending language in that evergreen request. An explicit `current_trend` mode and its `trend_run_id`/`trend_id` references pass through unchanged for server-side revalidation. Setting the switch to `false` is migration-only: a direct request without a mode becomes `evergreen`; it never enables an unverified current-trend claim.
+
+`MARKETING_MACHINE_REQUIRE_VERIFIED_TRENDS` is supported only as a deprecated compatibility alias for the explicit-mode switch. Its name does not describe the content rule: evergreen is allowed, while current-trend evidence is mandatory and server-revalidated in every configuration. Do not configure both names with conflicting values.
+
 ## Guardrails
 
 - No private scraping, login-wall bypassing, or platform Terms bypassing.

@@ -1,0 +1,22 @@
+services:
+  wmc-marketing-candidate:
+    environment:
+      LOCAL_OPENAI_BASE_URL: ${LOCAL_OPENAI_BASE_URL:?Set the approved private OpenAI-compatible model URL}
+      OLLAMA_BASE_URL: ${OLLAMA_BASE_URL:?Set the approved private Ollama URL}
+      COMFYUI_BASE_URL: ${COMFYUI_BASE_URL:?Set the approved private ComfyUI URL}
+      SEARXNG_BASE_URL: ${SEARXNG_BASE_URL:-http://ux-searxng:8080}
+      QDRANT_BASE_URL: ${QDRANT_BASE_URL:-http://core-qdrant:6333}
+      PROMETHEUS_BASE_URL: ${PROMETHEUS_BASE_URL:-http://shared-prometheus:9090}
+      GRAFANA_BASE_URL: ${GRAFANA_BASE_URL:-http://shared-grafana:3000}
+      POSTIZ_BASE_URL: ${POSTIZ_BASE_URL:-http://wmc-postiz:5000}
+      TWENTY_BASE_URL: ${TWENTY_BASE_URL:-http://wmc-twenty-server:3000}
+      MAUTIC_BASE_URL: ${MAUTIC_BASE_URL:-http://wmc-mautic-web:80}
+    networks:
+      - core-net
+      - shared-network
+
+networks:
+  core-net:
+    external: true
+  shared-network:
+    external: true

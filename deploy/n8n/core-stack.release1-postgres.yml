@@ -1,0 +1,129 @@
+name: core
+
+x-n8n-image: &n8n-image docker.n8n.io/n8nio/n8n@sha256:e0d9593724e36d2584a1686148155e881233b38ae1833101c97c6463c0d36711
+x-n8n-environment: &n8n-environment
+  DB_TYPE: postgresdb
+  DB_POSTGRESDB_HOST: core-n8n-postgres
+  DB_POSTGRESDB_PORT: "5432"
+  DB_POSTGRESDB_DATABASE: n8n
+  DB_POSTGRESDB_USER: n8n
+  DB_POSTGRESDB_PASSWORD_FILE: /run/secrets/n8n_postgres_password
+  DB_POSTGRESDB_SCHEMA: public
+  N8N_ENCRYPTION_KEY_FILE: /run/secrets/n8n_encryption_key
+  N8N_HOST: ${N8N_CANONICAL_HOST:?Set N8N_CANONICAL_HOST to the protected canonical hostname}
+  N8N_LISTEN_ADDRESS: 0.0.0.0
+  N8N_PORT: "5678"
+  N8N_PROTOCOL: http
+  N8N_PROXY_HOPS: "1"
+  N8N_SECURE_COOKIE: "true"
+  WEBHOOK_URL: ${N8N_WEBHOOK_URL:?Set N8N_WEBHOOK_URL to the protected canonical webhook URL}
+  N8N_EDITOR_BASE_URL: ${N8N_EDITOR_BASE_URL:?Set N8N_EDITOR_BASE_URL to the protected operator URL}
+  GENERIC_TIMEZONE: Europe/Berlin
+  N8N_DEFAULT_BINARY_DATA_MODE: database
+  N8N_AVAILABLE_BINARY_DATA_MODES: database
+  N8N_ENFORCE_SETTINGS_FILE_PERMISSIONS: "true"
+  N8N_BLOCK_ENV_ACCESS_IN_NODE: "true"
+  N8N_BLOCK_FILE_ACCESS_TO_N8N_FILES: "true"
+  N8N_RESTRICT_FILE_ACCESS_TO: /data/knowledge;/data/files
+  NODES_EXCLUDE: '["n8n-nodes-base.code", "n8n-nodes-base.executeCommand", "n8n-nodes-base.readWriteFile"]'
+  N8N_SSRF_PROTECTION_ENABLED: "true"
+  N8N_SSRF_ALLOWED_HOSTNAMES: wmc-marketing-agent
+  N8N_DIAGNOSTICS_ENABLED: "false"
+  N8N_VERSION_NOTIFICATIONS_ENABLED: "true"
+  N8N_METRICS: "true"
+  EXECUTIONS_DATA_SAVE_ON_ERROR: all
+  EXECUTIONS_DATA_SAVE_ON_SUCCESS: none
+  EXECUTIONS_DATA_SAVE_ON_PROGRESS: "false"
+  EXECUTIONS_DATA_SAVE_MANUAL_EXECUTIONS: "false"
+  EXECUTIONS_DATA_PRUNE: "true"
+  EXECUTIONS_DATA_MAX_AGE: "336"
+  EXECUTIONS_DATA_PRUNE_MAX_COUNT: "5000"
+  N8N_GRACEFUL_SHUTDOWN_TIMEOUT: "120"
+
+services:
+  core-n8n-postgres:
+    image: postgres:16@sha256:be01cf82fc7dbba824acf0a82e150b4b360f3ff93c6631d7844af431e841a95c
+    container_name: core-n8n-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: n8n
+      POSTGRES_USER: n8n
+      POSTGRES_PASSWORD_FILE: /run/secrets/n8n_postgres_password
+      POSTGRES_INITDB_ARGS: --data-checksums
+    secrets:
+      - n8n_postgres_password
+    volumes:
+      - n8n_postgres_data:/var/lib/postgresql/data
+    networks:
+      - n8n-data-net
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U n8n -d n8n"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+    shm_size: 256mb
+    security_opt:
+      - no-new-privileges:true
+    deploy:
+      resources:
+        limits:
+          memory: 2G
+
+  core-n8n:
+    image: *n8n-image
+    container_name: core-n8n
+    restart: unless-stopped
+    stop_grace_period: 2m
+    environment: *n8n-environment
+    secrets:
+      - n8n_postgres_password
+      - n8n_encryption_key
+    ports:
+      - 127.0.0.1:5678:5678
+    volumes:
+      - n8n_postgres_app_data:/home/node/.n8n
+      - /home/wamocon/lokal-ai/knowledge:/data/knowledge:ro
+      - /home/wamocon/lokal-ai/data/n8n-files:/data/files
+      - ${N8N_MIGRATION_SOURCE_DIR:?Set N8N_MIGRATION_SOURCE_DIR to the verified entity-export directory}:/backup:ro
+      - ${N8N_MIGRATION_WORK_DIR:?Set N8N_MIGRATION_WORK_DIR to a separate writable import directory}:/migration
+    extra_hosts:
+      - host.docker.internal:host-gateway
+    networks:
+      core-net:
+        aliases: [n8n]
+      n8n-data-net: {}
+    depends_on:
+      core-n8n-postgres:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "node -e \"fetch('http://127.0.0.1:5678/healthz/readiness').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))\""]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+      start_period: 60s
+    security_opt:
+      - no-new-privileges:true
+    deploy:
+      resources:
+        limits:
+          memory: 2G
+
+networks:
+  core-net:
+    external: true
+  n8n-data-net:
+    name: core-n8n-data-net
+    internal: true
+
+volumes:
+  n8n_postgres_app_data:
+    name: core-n8n-postgres-app-data
+  n8n_postgres_data:
+    name: core-n8n-postgres-data
+
+secrets:
+  n8n_postgres_password:
+    file: ./secrets/n8n_postgres_password
+  n8n_encryption_key:
+    file: ./secrets/n8n_encryption_key

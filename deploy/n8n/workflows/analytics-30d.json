@@ -1,6 +1,6 @@
 {
   "id": "WMCAnalytics30d1",
-  "name": "WAMOCON 30d Business Value Review",
+  "name": "WAMOCON 30d Due Discovery (Read Only)",
   "active": true,
   "nodes": [
     {
@@ -8,46 +8,46 @@
         "rule": {
           "interval": [
             {
-              "field": "months",
-              "triggerAtDayOfMonth": 1,
-              "triggerAtHour": 9
+              "field": "cronExpression",
+              "expression": "45 7 * * *"
             }
           ]
         }
       },
       "id": "monthly-30d-schedule",
-      "name": "Monthly 09:00",
+      "name": "Daily 07:45 discovery",
       "type": "n8n-nodes-base.scheduleTrigger",
       "typeVersion": 1,
       "position": [240, 300]
     },
     {
       "parameters": {
-        "method": "POST",
-        "url": "http://wmc-marketing-agent:8080/workflows/analytics-review",
-        "sendBody": true,
-        "bodyParameters": {
-          "parameters": [
-            {
-              "name": "review_window",
-              "value": "30d"
-            }
-          ]
-        }
+        "url": "http://wmc-marketing-agent:8080/workflows/analytics/due?review_window=30d",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth"
       },
       "id": "call-agent-30d",
-      "name": "Evaluate 30d business value",
+      "name": "Discover content due for 30d review (read only)",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4,
-      "position": [520, 300]
+      "position": [520, 300],
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 3000,
+      "onError": "stopWorkflow",
+      "credentials": {
+        "httpHeaderAuth": {
+          "name": "WAMOCON Agent Access Token"
+        }
+      }
     }
   ],
   "connections": {
-    "Monthly 09:00": {
+    "Daily 07:45 discovery": {
       "main": [
         [
           {
-            "node": "Evaluate 30d business value",
+            "node": "Discover content due for 30d review (read only)",
             "type": "main",
             "index": 0
           }

@@ -1,6 +1,8 @@
 services:
   wmc-postiz:
-    image: ghcr.io/gitroomhq/postiz-app:latest
+    # Audited running digest on 2026-07-10. Change only through a backed-up,
+    # staged migration because the upstream release train contains major jumps.
+    image: ${POSTIZ_IMAGE:-ghcr.io/gitroomhq/postiz-app@sha256:1d5a5dc6b896747d1483c01dc2562165bd313ad601b32f6cabb7f7dd08a911a9}
     container_name: wmc-postiz
     restart: unless-stopped
     profiles: ["postiz"]
@@ -14,7 +16,7 @@ services:
       BACKEND_INTERNAL_URL: http://localhost:3000
       TEMPORAL_ADDRESS: wmc-postiz-temporal:7233
       IS_GENERAL: "true"
-      DISABLE_REGISTRATION: ${POSTIZ_DISABLE_REGISTRATION:-false}
+      DISABLE_REGISTRATION: ${POSTIZ_DISABLE_REGISTRATION:-true}
       STORAGE_PROVIDER: local
       UPLOAD_DIRECTORY: /uploads
       NEXT_PUBLIC_UPLOAD_DIRECTORY: /uploads
@@ -44,12 +46,22 @@ services:
         condition: service_healthy
       wmc-postiz-temporal:
         condition: service_started
+    healthcheck:
+      test:
+        - CMD
+        - node
+        - -e
+        - "fetch('http://127.0.0.1:5000/api/auth/can-register').then(r=>r.ok?r.json():Promise.reject()).then(j=>{if(j.register!==false)process.exit(1)}).catch(()=>process.exit(1))"
+      start_period: 30s
+      interval: 15s
+      timeout: 5s
+      retries: 20
     networks:
-      - growth-net
       - core-net
+      - postiz-data-net
 
   wmc-postiz-postgres:
-    image: postgres:17-alpine
+    image: ${POSTIZ_POSTGRES_IMAGE:-postgres:17.10-alpine@sha256:67f624a4ad70edba8d65c82341124fab7054b277b4f7dea4b04be6f939ce2314}
     container_name: wmc-postiz-postgres
     restart: unless-stopped
     profiles: ["postiz"]
@@ -65,10 +77,10 @@ services:
       timeout: 5s
       retries: 10
     networks:
-      - growth-net
+      - postiz-data-net
 
   wmc-postiz-redis:
-    image: redis:7.2
+    image: ${POSTIZ_REDIS_IMAGE:-redis:7.2@sha256:e51cbc16f94b2426e80b9516db174a07d55e882217a1ec1d729b137b32e24e42}
     container_name: wmc-postiz-redis
     restart: unless-stopped
     profiles: ["postiz"]
@@ -81,10 +93,10 @@ services:
       timeout: 5s
       retries: 10
     networks:
-      - growth-net
+      - postiz-data-net
 
   wmc-postiz-temporal-elasticsearch:
-    image: elasticsearch:7.17.27
+    image: ${POSTIZ_ELASTICSEARCH_IMAGE:-elasticsearch:7.17.27@sha256:9a6443f55243f6acbfeb4a112d15eb3b9aac74bf25e0e39fa19b3ddd3a6879d0}
     container_name: wmc-postiz-temporal-elasticsearch
     restart: unless-stopped
     profiles: ["postiz"]
@@ -102,7 +114,7 @@ services:
       - postiz-temporal-net
 
   wmc-postiz-temporal-postgres:
-    image: postgres:16
+    image: ${POSTIZ_TEMPORAL_POSTGRES_IMAGE:-postgres:16.14@sha256:be01cf82fc7dbba824acf0a82e150b4b360f3ff93c6631d7844af431e841a95c}
     container_name: wmc-postiz-temporal-postgres
     restart: unless-stopped
     profiles: ["postiz"]
@@ -115,7 +127,7 @@ services:
       - postiz-temporal-net
 
   wmc-postiz-temporal:
-    image: temporalio/auto-setup:1.28.1
+    image: ${POSTIZ_TEMPORAL_IMAGE:-temporalio/auto-setup:1.28.1@sha256:607d68caa111338d754771efb876c92dfcdae06d056e4530bb31cd0f37406e6a}
     container_name: wmc-postiz-temporal
     restart: unless-stopped
     profiles: ["postiz"]
@@ -136,11 +148,11 @@ services:
       - wmc-postiz-temporal-postgres
       - wmc-postiz-temporal-elasticsearch
     networks:
-      - growth-net
+      - postiz-data-net
       - postiz-temporal-net
 
   wmc-twenty-server:
-    image: twentycrm/twenty:${TWENTY_TAG:-latest}
+    image: ${TWENTY_IMAGE:-twentycrm/twenty@sha256:d81e5cc59ef8d9f6f4567dcd390bbcde3ae1600c88f2c90c4330126ba407f1da}
     container_name: wmc-twenty-server
     restart: unless-stopped
     profiles: ["twenty"]
@@ -170,11 +182,11 @@ services:
       timeout: 5s
       retries: 30
     networks:
-      - growth-net
       - core-net
+      - twenty-data-net
 
   wmc-twenty-worker:
-    image: twentycrm/twenty:${TWENTY_TAG:-latest}
+    image: ${TWENTY_IMAGE:-twentycrm/twenty@sha256:d81e5cc59ef8d9f6f4567dcd390bbcde3ae1600c88f2c90c4330126ba407f1da}
     container_name: wmc-twenty-worker
     restart: unless-stopped
     profiles: ["twenty"]
@@ -197,10 +209,10 @@ services:
       wmc-twenty-server:
         condition: service_healthy
     networks:
-      - growth-net
+      - twenty-data-net
 
   wmc-twenty-db:
-    image: postgres:16
+    image: ${TWENTY_POSTGRES_IMAGE:-postgres:16.14@sha256:be01cf82fc7dbba824acf0a82e150b4b360f3ff93c6631d7844af431e841a95c}
     container_name: wmc-twenty-db
     restart: unless-stopped
     profiles: ["twenty"]
@@ -216,10 +228,10 @@ services:
       timeout: 5s
       retries: 10
     networks:
-      - growth-net
+      - twenty-data-net
 
   wmc-twenty-redis:
-    image: redis:7-alpine
+    image: ${TWENTY_REDIS_IMAGE:-redis:7-alpine@sha256:6ab0b6e7381779332f97b8ca76193e45b0756f38d4c0dcda72dbb3c32061ab99}
     container_name: wmc-twenty-redis
     restart: unless-stopped
     profiles: ["twenty"]
@@ -230,10 +242,10 @@ services:
       timeout: 5s
       retries: 10
     networks:
-      - growth-net
+      - twenty-data-net
 
   wmc-mautic-db:
-    image: mysql:lts
+    image: ${MAUTIC_MYSQL_IMAGE:-mysql@sha256:ad88e1c86cbf12ef52d0a0360cd4b774d22956c5ee9c565645fb019d7aacb6c3}
     container_name: wmc-mautic-db
     restart: unless-stopped
     profiles: ["mautic"]
@@ -251,10 +263,10 @@ services:
       timeout: 5s
       retries: 20
     networks:
-      - growth-net
+      - mautic-data-net
 
   wmc-mautic-web:
-    image: mautic/mautic:latest
+    image: ${MAUTIC_IMAGE:-mautic/mautic@sha256:373a3de08dfce296e31fe0b7caf269594c43020454628f445c169990b9af4d5e}
     container_name: wmc-mautic-web
     restart: unless-stopped
     profiles: ["mautic"]
@@ -278,17 +290,18 @@ services:
       wmc-mautic-db:
         condition: service_healthy
     healthcheck:
-      test: ["CMD-SHELL", "curl --fail http://localhost"]
+      # Follow the installer redirect so a downstream HTTP 500 cannot appear healthy.
+      test: ["CMD-SHELL", "curl --fail --location --silent --show-error --output /dev/null http://localhost"]
       start_period: 20s
       interval: 10s
       timeout: 5s
       retries: 60
     networks:
-      - growth-net
       - core-net
+      - mautic-data-net
 
   wmc-mautic-cron:
-    image: mautic/mautic:latest
+    image: ${MAUTIC_IMAGE:-mautic/mautic@sha256:373a3de08dfce296e31fe0b7caf269594c43020454628f445c169990b9af4d5e}
     container_name: wmc-mautic-cron
     restart: unless-stopped
     profiles: ["mautic"]
@@ -310,10 +323,10 @@ services:
       wmc-mautic-web:
         condition: service_healthy
     networks:
-      - growth-net
+      - mautic-data-net
 
   wmc-mautic-worker:
-    image: mautic/mautic:latest
+    image: ${MAUTIC_IMAGE:-mautic/mautic@sha256:373a3de08dfce296e31fe0b7caf269594c43020454628f445c169990b9af4d5e}
     container_name: wmc-mautic-worker
     restart: unless-stopped
     profiles: ["mautic"]
@@ -335,7 +348,7 @@ services:
       wmc-mautic-web:
         condition: service_healthy
     networks:
-      - growth-net
+      - mautic-data-net
 
 volumes:
   wmc_postiz_config:
@@ -349,9 +362,17 @@ volumes:
   wmc_mautic_mysql:
 
 networks:
-  growth-net:
-    name: wmc-marketing-growth
+  postiz-data-net:
+    name: wmc-postiz-data
+    internal: true
   postiz-temporal-net:
     name: wmc-postiz-temporal
+    internal: true
+  twenty-data-net:
+    name: wmc-twenty-data
+    internal: true
+  mautic-data-net:
+    name: wmc-mautic-data
+    internal: true
   core-net:
     external: true

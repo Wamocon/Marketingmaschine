@@ -1,0 +1,7 @@
+# Direct CI tools only. Runtime dependencies remain isolated in runtime.lock.
+# Regenerate from the repository root with:
+# uv pip compile requirements/ci.in --python-version 3.12 --python-platform linux --generate-hashes --output-file requirements/ci.lock
+pytest==9.1.1
+pytest-asyncio==1.4.0
+ruff==0.15.20
+mypy==2.2.0

@@ -1,0 +1,77 @@
+{
+  "id": "WMCTrendResearch01",
+  "name": "WAMOCON Marketing - Verified Trend Research",
+  "active": true,
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "wamocon-marketing/trend-research",
+        "authentication": "headerAuth",
+        "responseMode": "responseNode"
+      },
+      "id": "trend-webhook",
+      "name": "Trend Research Request",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [220, 300],
+      "webhookId": "wamocon-marketing-trend-research",
+      "credentials": {
+        "httpHeaderAuth": {
+          "name": "WAMOCON Inbound Webhook Token"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://wmc-marketing-agent:8080/workflows/trend-research",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ { ...$json.body, request_id: $execution.id } }}",
+        "options": {
+          "timeout": 120000
+        }
+      },
+      "id": "run-research",
+      "name": "Search And Verify Public Sources",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [500, 300],
+      "retryOnFail": false,
+      "maxTries": 1,
+      "onError": "stopWorkflow",
+      "credentials": {
+        "httpHeaderAuth": {
+          "name": "WAMOCON Agent Access Token"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ $json }}"
+      },
+      "id": "respond",
+      "name": "Return Verified Research",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [780, 300]
+    }
+  ],
+  "connections": {
+    "Trend Research Request": {
+      "main": [[{"node": "Search And Verify Public Sources", "type": "main", "index": 0}]]
+    },
+    "Search And Verify Public Sources": {
+      "main": [[{"node": "Return Verified Research", "type": "main", "index": 0}]]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "saveDataErrorExecution": "all",
+    "saveDataSuccessExecution": "all"
+  }
+}

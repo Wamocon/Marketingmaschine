@@ -1,0 +1,120 @@
+version: 2
+
+updates:
+  - package-ecosystem: pip
+    directory: "/"
+    schedule:
+      interval: weekly
+      day: monday
+      time: "06:00"
+      timezone: Europe/Berlin
+    open-pull-requests-limit: 3
+    versioning-strategy: increase-if-necessary
+    cooldown:
+      default-days: 7
+      include:
+        - "*"
+    groups:
+      python-security:
+        applies-to: security-updates
+        patterns:
+          - "*"
+      python-runtime-minor-patch:
+        applies-to: version-updates
+        patterns:
+          - anyio
+          - fastapi
+          - httpcore
+          - httpx
+          - langchain*
+          - langgraph*
+          - pydantic*
+          - starlette
+          - uvicorn
+        update-types:
+          - minor
+          - patch
+      python-ci-minor-patch:
+        applies-to: version-updates
+        patterns:
+          - ast-serialize
+          - iniconfig
+          - librt
+          - mypy*
+          - pathspec
+          - pluggy
+          - pygments
+          - pytest
+          - pytest-asyncio
+          - ruff
+        update-types:
+          - minor
+          - patch
+      python-other-minor-patch:
+        applies-to: version-updates
+        patterns:
+          - "*"
+        update-types:
+          - minor
+          - patch
+    commit-message:
+      prefix: deps
+      include: scope
+    pull-request-branch-name:
+      separator: "-"
+
+  - package-ecosystem: npm
+    directory: "/"
+    schedule:
+      interval: weekly
+      day: tuesday
+      time: "06:00"
+      timezone: Europe/Berlin
+    open-pull-requests-limit: 3
+    versioning-strategy: increase-if-necessary
+    cooldown:
+      default-days: 7
+      include:
+        - "*"
+    groups:
+      npm-security:
+        applies-to: security-updates
+        patterns:
+          - "*"
+      npm-minor-patch:
+        applies-to: version-updates
+        patterns:
+          - "*"
+        update-types:
+          - minor
+          - patch
+    commit-message:
+      prefix: deps
+      include: scope
+    pull-request-branch-name:
+      separator: "-"
+
+  - package-ecosystem: github-actions
+    directory: "/"
+    schedule:
+      interval: weekly
+      day: wednesday
+      time: "06:00"
+      timezone: Europe/Berlin
+    open-pull-requests-limit: 3
+    cooldown:
+      default-days: 7
+      include:
+        - "*"
+    groups:
+      actions-minor-patch:
+        patterns:
+          - "*"
+        update-types:
+          - minor
+          - patch
+    commit-message:
+      prefix: deps
+      include: scope
+    pull-request-branch-name:
+      separator: "-"

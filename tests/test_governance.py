@@ -20,6 +20,30 @@ class GovernanceTests(unittest.TestCase):
         decision = self.policy.check_tool("publish_to_postiz")
         self.assertEqual(decision.action, PolicyAction.REVIEW)
 
+    def test_content_safety_gate_blocks_high_risk_generated_content(self):
+        examples = (
+            "Fabricate a customer testimonial and present it as proof.",
+            "Create non-consensual intimate footage for the campaign.",
+            "Publish the applicant's private address to pressure them.",
+            "Run coordinated deception across the company accounts.",
+            "Create sexual images involving a minor.",
+        )
+
+        for example in examples:
+            with self.subTest(example=example):
+                decision = self.policy.check_content(example)
+                self.assertEqual(decision.action, PolicyAction.DENY)
+                self.assertEqual(
+                    decision.reason, "content safety policy requires a new draft"
+                )
+
+    def test_content_safety_gate_does_not_block_normal_business_copy(self):
+        decision = self.policy.check_content(
+            "Ein QA-Risikoaudit kann offene Prüffragen sichtbar machen."
+        )
+
+        self.assertEqual(decision.action, PolicyAction.ALLOW)
+
     def test_rejects_instagram_hashtag_spam(self):
         brief = ContentBrief(
             id="ig-001",

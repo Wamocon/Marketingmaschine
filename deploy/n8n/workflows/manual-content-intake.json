@@ -1,4 +1,5 @@
 {
+  "id": "lYfpV4r4oeEzPtuO",
   "name": "WAMOCON Marketing - Manual Content Intake",
   "active": true,
   "nodes": [
@@ -6,6 +7,7 @@
       "parameters": {
         "httpMethod": "POST",
         "path": "wamocon-marketing/content-intake",
+        "authentication": "headerAuth",
         "responseMode": "responseNode"
       },
       "id": "manual-intake-webhook",
@@ -13,21 +15,38 @@
       "type": "n8n-nodes-base.webhook",
       "typeVersion": 2,
       "position": [240, 300],
-      "webhookId": "wamocon-marketing-content-intake"
+      "webhookId": "wamocon-marketing-content-intake",
+      "credentials": {
+        "httpHeaderAuth": {
+          "name": "WAMOCON Inbound Webhook Token"
+        }
+      }
     },
     {
       "parameters": {
         "method": "POST",
         "url": "http://wmc-marketing-agent:8080/workflows/create-content",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
         "sendBody": true,
         "specifyBody": "json",
-        "jsonBody": "={{ $json.body }}"
+        "jsonBody": "={{ { ...$json.body, content_mode: $json.body && $json.body.content_mode ? String($json.body.content_mode).trim().toLowerCase() : 'evergreen' } }}"
       },
       "id": "create-content",
       "name": "Create Content State",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4,
-      "position": [520, 300]
+      "position": [520, 300],
+      "notes": "The workflow always sends an explicit content_mode. An omitted mode becomes evergreen and remains subject to the API's current/latest/trending-claim guard. current_trend passes only stored trend_run_id and trend_id references; the API reconstructs and revalidates all evidence.",
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 2000,
+      "onError": "stopWorkflow",
+      "credentials": {
+        "httpHeaderAuth": {
+          "name": "WAMOCON Agent Access Token"
+        }
+      }
     },
     {
       "parameters": {
@@ -49,5 +68,13 @@
       "main": [[{"node": "Return Content State", "type": "main", "index": 0}]]
     }
   },
-  "settings": {"executionOrder": "v1"}
+  "settings": {"executionOrder": "v1"},
+  "meta": {
+    "inbound_content_mode_required": false,
+    "content_mode_supplied_to_api": true,
+    "missing_content_mode_default": "evergreen",
+    "accepted_content_modes": ["evergreen", "current_trend"],
+    "trend_evidence_authority": "stored_marketing_agent_trend_run",
+    "current_trend_evidence_revalidated_by_api": true
+  }
 }

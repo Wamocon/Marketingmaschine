@@ -1,0 +1,98 @@
+name: shared-infra
+
+services:
+  shared-prometheus:
+    image: prom/prometheus:v3.13.0@sha256:c6b27ea434f8389bfe233fbc7be381cf50587c286e871bc842008f5a1b1908a7
+    container_name: shared-prometheus
+    restart: unless-stopped
+    command:
+      - --config.file=/etc/prometheus/prometheus.yml
+      - --storage.tsdb.path=/prometheus
+      - --storage.tsdb.retention.time=30d
+      - --storage.tsdb.retention.size=20GB
+      - --web.enable-lifecycle
+    extra_hosts:
+      - host.docker.internal:host-gateway
+    ports:
+      - 127.0.0.1:9091:9090
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - ./rules:/etc/prometheus/rules:ro
+      - shared-prometheus-data:/prometheus
+    networks:
+      - shared-network
+      - core-net
+    security_opt:
+      - no-new-privileges:true
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://127.0.0.1:9090/-/ready | grep -q 'Prometheus Server is Ready'"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 15s
+
+  shared-grafana:
+    image: grafana/grafana:13.1.0@sha256:121a7a9ece6dc10b969f1f96eed64b4f07dfac0d0b8abc070f7cb83bbde86f63
+    container_name: shared-grafana
+    restart: unless-stopped
+    environment:
+      GF_SECURITY_ADMIN_USER: ${GRAFANA_ADMIN_USER:-admin}
+      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_ADMIN_PASSWORD:?Set GRAFANA_ADMIN_PASSWORD in the private .env file}
+      GF_AUTH_ANONYMOUS_ENABLED: "false"
+      GF_USERS_ALLOW_SIGN_UP: "false"
+      GF_SECURITY_DISABLE_GRAVATAR: "true"
+      GF_ANALYTICS_REPORTING_ENABLED: "false"
+      GF_ANALYTICS_CHECK_FOR_UPDATES: "false"
+    ports:
+      - 127.0.0.1:3030:3000
+    volumes:
+      - ./grafana/provisioning:/etc/grafana/provisioning:ro
+      - shared-grafana-data:/var/lib/grafana
+    networks:
+      - shared-network
+    security_opt:
+      - no-new-privileges:true
+    depends_on:
+      shared-prometheus:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://127.0.0.1:3000/api/health | grep -q 'ok'"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+  # Loki is intentionally opt-in until the deprecated v11/boltdb configuration
+  # is migrated and Grafana Alloy is introduced for container log collection.
+  shared-loki:
+    profiles: ["logs"]
+    image: grafana/loki:3.1.0@sha256:d947e68a84d9e44915dfa08c3bec27e2124efd5ba6c83443eb53578101ec69e3
+    container_name: shared-loki
+    restart: unless-stopped
+    command: -config.file=/etc/loki/local-config.yaml
+    ports:
+      - 127.0.0.1:3101:3100
+    volumes:
+      - ./loki-config.yml:/etc/loki/local-config.yaml:ro
+      - shared-loki-data:/loki
+    networks:
+      - shared-network
+    security_opt:
+      - no-new-privileges:true
+
+networks:
+  shared-network:
+    external: true
+  core-net:
+    external: true
+
+volumes:
+  shared-prometheus-data:
+    external: true
+    name: ${SHARED_PROMETHEUS_DATA_VOLUME:-shared-infra-stage_shared-prometheus-data}
+  shared-loki-data:
+    external: true
+    name: ${SHARED_LOKI_DATA_VOLUME:-shared-infra-stage_shared-loki-data}
+  shared-grafana-data:
+    external: true
+    name: ${SHARED_GRAFANA_DATA_VOLUME:-shared-infra-stage_shared-grafana-data}

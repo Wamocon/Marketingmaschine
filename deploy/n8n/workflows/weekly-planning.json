@@ -1,4 +1,5 @@
 {
+  "id": "GqGVw06F64o7rvjI",
   "name": "WAMOCON Weekly Planning",
   "active": true,
   "nodes": [
@@ -24,6 +25,8 @@
       "parameters": {
         "method": "POST",
         "url": "http://wmc-marketing-agent:8080/workflows/weekly-planning",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
         "sendBody": true,
         "bodyParameters": {
           "parameters": [
@@ -38,7 +41,16 @@
       "name": "Create rolling 30-day plan",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4,
-      "position": [520, 300]
+      "position": [520, 300],
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 5000,
+      "onError": "stopWorkflow",
+      "credentials": {
+        "httpHeaderAuth": {
+          "name": "WAMOCON Agent Access Token"
+        }
+      }
     }
   ],
   "connections": {

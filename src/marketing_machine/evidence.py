@@ -8,8 +8,9 @@ from .schemas import EvidenceItem
 
 
 class EvidenceVault:
-    def __init__(self, items: Iterable[EvidenceItem] = ()) -> None:
+    def __init__(self, items: Iterable[EvidenceItem] = (), *, version: str = "") -> None:
         self._items = {item.id: item for item in items}
+        self.version = str(version).strip()
 
     @classmethod
     def from_json_file(cls, path: str | Path) -> "EvidenceVault":
@@ -27,7 +28,7 @@ class EvidenceVault:
             )
             for item in data.get("items", [])
         ]
-        return cls(items)
+        return cls(items, version=str(data.get("version", "")).strip())
 
     def validate_proof_sources(self, proof_sources: list[str]) -> list[str]:
         errors: list[str] = []
@@ -57,6 +58,8 @@ class EvidenceVault:
                     "approved_for_public_use": item.approved_for_public_use,
                     "consent_ref": item.consent_ref,
                     "owner": item.owner,
+                    "created_at": item.created_at,
+                    "vault_version": self.version,
                 }
             )
         return records

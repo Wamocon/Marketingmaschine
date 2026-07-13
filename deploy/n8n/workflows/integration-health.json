@@ -1,4 +1,5 @@
 {
+  "id": "Psaft2cYujD42MAs",
   "name": "WAMOCON Marketing - Integration Health",
   "active": true,
   "nodes": [
@@ -21,13 +22,24 @@
     },
     {
       "parameters": {
-        "url": "http://wmc-marketing-agent:8080/integrations/status"
+        "url": "http://wmc-marketing-agent:8080/integrations/status",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth"
       },
       "id": "check-status",
       "name": "Check Agent Integrations",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4,
-      "position": [520, 300]
+      "position": [520, 300],
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 3000,
+      "onError": "continueRegularOutput",
+      "credentials": {
+        "httpHeaderAuth": {
+          "name": "WAMOCON Agent Access Token"
+        }
+      }
     }
   ],
   "connections": {

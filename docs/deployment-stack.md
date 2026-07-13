@@ -1,61 +1,16 @@
-# Deployment Stack
+# Deployment stack (deprecated entry point)
 
-## Core Local Stack
+Do not deploy `deploy/docker-compose.core.yml`. It is a legacy development
+scaffold with public database/Redis ports, placeholder credentials, floating
+images, and a second n8n stack; it is not a production path.
 
-Use `deploy/docker-compose.core.yml` for the first internal deployment:
+Use these maintained runbooks instead:
 
-- Postgres for records and audit log
-- Redis for queue mode
-- n8n in queue mode
-- n8n worker
-- marketing-agent API
+- [`remote-project-runbook.md`](remote-project-runbook.md) for the existing
+  NVIDIA machine, marketing application, protected access, and validation.
+- [`../deploy/n8n/README-hardening.md`](../deploy/n8n/README-hardening.md) for
+  the staged n8n SQLite-to-Postgres migration and later queue-mode release.
 
-This compose file is a starting template. Replace default passwords and `N8N_ENCRYPTION_KEY` through a secret manager before production.
-
-## Local Model Serving
-
-Use the DGX/local GPU host for Qwen:
-
-```bash
-deploy/local-model/vllm-qwen.example.sh
-```
-
-Production requirements:
-
-- pin model revision
-- monitor GPU memory and request latency
-- expose OpenAI-compatible endpoint internally only
-- do not send private prompts to cloud fallback by default
-
-## n8n
-
-Use queue mode for reliability:
-
-- one main n8n service
-- one or more workers
-- Redis queue
-- Postgres database
-
-Import workflow templates from:
-
-- `deploy/n8n/workflows/weekly-planning.json`
-- `deploy/n8n/workflows/analytics-72h.json`
-
-## Publishing
-
-Use Postiz or Metricool.
-
-The Scheduler Agent creates draft payloads only. Humans approve the final scheduled item in the publishing tool.
-
-## Lead Stack
-
-Recommended open-source path:
-
-- Mautic for landing forms, segments, email nurturing, and lead scoring
-- Twenty for CRM and sales follow-up
-
-Alternative:
-
-- HubSpot for CRM and marketing automation
-
-All leads must include campaign, offer, persona, UTM, and source content id.
+The production invariant is one `core-n8n` control plane, pinned images,
+private Postgres/Redis networks, explicit secrets, protected canonical URLs,
+and a reversible migration with the original SQLite volume retained.

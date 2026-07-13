@@ -1,16 +1,17 @@
 # Resource Allocation
 
-Last checked: 2026-06-30
+Last successful inventory: 2026-06-30. Nvidia-1 was unavailable at the final
+13 July office-network check, so the split below is historical until re-attested.
 
-## Current split
+## Last-observed intended split
 
-- Nvidia-1 (`spark-f752`) is the control plane.
+- Nvidia-1 (`<NVIDIA1_HOST>`) is the intended control plane.
   - Runs the marketing agent, n8n, Postiz, Mautic, Twenty, monitoring, and existing local stack services.
   - Marketing agent is small: about 40 MiB RAM.
   - Local Ollama models are not kept loaded for the marketing agent.
-- Nvidia-2 (`spark-651f`) is the model and creative worker.
-  - Runs Ollama on `10.100.104.2:11434`.
-  - Runs ComfyUI on `10.100.104.2:8188`.
+- Nvidia-2 (`<NVIDIA2_HOST>`) is the intended model and creative worker.
+  - Runs Ollama on `<APPROVED_PRIVATE_OLLAMA_URL>`.
+  - Runs ComfyUI on `<APPROVED_PRIVATE_COMFYUI_URL>`.
   - Keeps `qwen3.6:35b` available for private marketing work.
   - `gemma4:31b` is kept on demand, not permanently warm.
 
@@ -19,9 +20,9 @@ Last checked: 2026-06-30
 The marketing agent reads these values from `deploy/marketing-agent.generated.env` on Nvidia-1:
 
 ```env
-COMFYUI_BASE_URL=http://10.100.104.2:8188
-OLLAMA_BASE_URL=http://10.100.104.2:11434
-LOCAL_OPENAI_BASE_URL=http://10.100.104.2:11434/v1
+COMFYUI_BASE_URL=<APPROVED_PRIVATE_COMFYUI_URL>
+OLLAMA_BASE_URL=<APPROVED_PRIVATE_OLLAMA_URL>
+LOCAL_OPENAI_BASE_URL=<APPROVED_PRIVATE_OPENAI_COMPATIBLE_URL>
 LOCAL_OPENAI_API_KEY=ollama
 LOCAL_MODEL_NAME=qwen3.6:35b
 ```
@@ -37,13 +38,17 @@ Nvidia-1 previously had both `qwen3.6:35b` and `gemma4:31b` loaded with `262144`
 Run these from the project root on Nvidia-1:
 
 ```bash
-python3 scripts/smoke_api.py --base-url http://127.0.0.1:8117 --n8n-url http://127.0.0.1:5678
-curl -fsS http://127.0.0.1:8117/integrations/status | python3 -m json.tool
+python3 scripts/smoke_api.py \
+  --base-url http://127.0.0.1:8117 \
+  --access-token-file deploy/secrets/marketing_mutation_token
 ```
 
 Run these from any host with SSH access:
 
 ```bash
-ssh Nvidia-1-Main "free -h; ollama ps"
-ssh Nvidia-2 "free -h; ollama ps"
+ssh "$WAMOCON_NVIDIA1_SSH_HOST" "free -h; ollama ps"
+ssh "$WAMOCON_NVIDIA2_SSH_HOST" "free -h; ollama ps"
 ```
+
+Load both SSH aliases from the protected service catalog. Do not commit concrete
+hostnames or private addresses to this public repository.

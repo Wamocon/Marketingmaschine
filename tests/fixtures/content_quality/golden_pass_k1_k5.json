@@ -1,0 +1,366 @@
+{
+  "items": [
+    {
+      "brief": {
+        "id": "golden-k1-ai",
+        "campaign_id": "k1",
+        "campaign": "Consulting Test- und Qualitätsmanagement",
+        "persona": "IT-Leiter und QA-Verantwortliche",
+        "channel": "LinkedIn",
+        "format": "expert_post",
+        "objective": "QA-Risiken sachlich einordnen.",
+        "cta": "QA-Risikoaudit anfragen",
+        "proof_sources": ["Kampagnen/kampagne_1_consulting_qa.json"],
+        "utm": {
+          "utm_source": "linkedin",
+          "utm_medium": "organic",
+          "utm_campaign": "k1_qa_consulting"
+        },
+        "hypothesis": "Interne Testannahme.",
+        "test_variable": "hook_and_format",
+        "language": "de-DE",
+        "risk_flags": ["outcome_claims_require_evidence"],
+        "trend_id": "trend-k1-grounded",
+        "trend_sources": [
+          "https://www.qytera.de/blog/testautomatisierung-tipps-goldene-regeln",
+          "https://glossary.istqb.org/de_DE/search/testautomatisierung"
+        ],
+        "public_copy": "QA-Risiken strukturiert prüfen\n\nWAMOCON kann QA-Risiken, Testabdeckung und Freigabeprozesse strukturiert prüfen und priorisieren.\n\nWelche QA-Frage braucht zuerst Ihre Aufmerksamkeit und wie möchten Sie sie prüfen?\n\nQA-Risikoaudit anfragen",
+        "channel_copy": {
+          "headline": "QA-Risiken strukturiert prüfen",
+          "body": "WAMOCON kann QA-Risiken, Testabdeckung und Freigabeprozesse strukturiert prüfen und priorisieren. Welche QA-Frage braucht zuerst Ihre Aufmerksamkeit und wie möchten Sie sie prüfen?",
+          "caption": "",
+          "cta": "QA-Risikoaudit anfragen",
+          "hashtags": ["QA", "Testmanagement"],
+          "carousel_slides": []
+        },
+        "reel_output": {
+          "idea": "",
+          "format": "",
+          "hook": "",
+          "script": [],
+          "shot_list": [],
+          "on_screen_text": [],
+          "caption": "",
+          "cta": "",
+          "editing_notes": ""
+        },
+        "citations": [
+          {
+            "url": "https://www.qytera.de/blog/testautomatisierung-tipps-goldene-regeln",
+            "label": "Qytera: Testautomatisierung",
+            "supports": "Fachlicher Kontext zur Einordnung von Testautomatisierung."
+          },
+          {
+            "url": "https://glossary.istqb.org/de_DE/search/testautomatisierung",
+            "label": "ISTQB Glossar",
+            "supports": "Unabhängige Begriffseinordnung für Testautomatisierung."
+          }
+        ],
+        "generation": {
+          "status": "ai_generated",
+          "schema_version": "wamocon-content-v1",
+          "provider": "local_openai_compatible",
+          "model": "qwen3.5-35b-a3b",
+          "route": "local_content_primary",
+          "latency_ms": 4820,
+          "attempts": 1,
+          "fallback_used": false,
+          "fallback_reason": "",
+          "error": "",
+          "semantic_repair_used": false,
+          "validation_failures": 0,
+          "deterministic_structure_fill": false,
+          "response_id": "golden-response-k1",
+          "usage": {"input_tokens": 850, "output_tokens": 280},
+          "structured_output_mode": "json_schema"
+        }
+      }
+    },
+    {
+      "brief": {
+        "id": "golden-k2-ai",
+        "campaign_id": "k2",
+        "campaign": "KI (Sokrates)",
+        "persona": "Geschäftsführer und IT-Leiter",
+        "channel": "LinkedIn",
+        "format": "carousel",
+        "objective": "Die freigegebene Sokrates-Positionierung verständlich erklären.",
+        "cta": "Private-KI-Erstgespräch anfragen",
+        "proof_sources": ["Kampagnen/kampagne_2_ki_sokrates.json"],
+        "utm": {
+          "utm_source": "linkedin",
+          "utm_medium": "organic",
+          "utm_campaign": "k2_sokrates"
+        },
+        "hypothesis": "Interne Testannahme.",
+        "test_variable": "hook_and_format",
+        "language": "de-DE",
+        "risk_flags": ["architecture_and_compliance_claims_require_evidence"],
+        "trend_id": "",
+        "trend_sources": [],
+        "public_copy": "Sokrates für den Mittelstand\n\nSokrates Private AI positioniert KI-Nutzung für den Mittelstand mit Fokus auf Datenschutz und internes Wissen. Welche Anforderungen möchten Geschäftsführer und IT-Leiter zuerst einordnen?\n\nPrivate-KI-Erstgespräch anfragen",
+        "channel_copy": {
+          "headline": "Sokrates für den Mittelstand",
+          "body": "Sokrates Private AI positioniert KI-Nutzung für den Mittelstand mit Fokus auf Datenschutz und internes Wissen. Welche Anforderungen möchten Geschäftsführer und IT-Leiter zuerst einordnen?",
+          "caption": "",
+          "cta": "Private-KI-Erstgespräch anfragen",
+          "hashtags": ["PrivateKI", "Mittelstand"],
+          "carousel_slides": [
+            "Private KI im Mittelstand",
+            "Sokrates Private AI positioniert KI-Nutzung für den Mittelstand mit Fokus auf Datenschutz und internes Wissen.",
+            "Welche Anforderungen möchten Geschäftsführer und IT-Leiter zuerst einordnen?",
+            "Private-KI-Erstgespräch anfragen"
+          ]
+        },
+        "reel_output": {
+          "idea": "",
+          "format": "",
+          "hook": "",
+          "script": [],
+          "shot_list": [],
+          "on_screen_text": [],
+          "caption": "",
+          "cta": "",
+          "editing_notes": ""
+        },
+        "citations": [],
+        "generation": {
+          "status": "ai_generated",
+          "schema_version": "wamocon-content-v1",
+          "provider": "local_openai_compatible",
+          "model": "qwen3.5-35b-a3b",
+          "route": "local_content_primary",
+          "latency_ms": 5130,
+          "attempts": 1,
+          "fallback_used": false,
+          "fallback_reason": "",
+          "error": "",
+          "semantic_repair_used": false,
+          "validation_failures": 0,
+          "deterministic_structure_fill": false,
+          "response_id": "golden-response-k2",
+          "usage": {"input_tokens": 900, "output_tokens": 360},
+          "structured_output_mode": "json_schema"
+        }
+      }
+    },
+    {
+      "brief": {
+        "id": "golden-k3-ai",
+        "campaign_id": "k3",
+        "campaign": "LFA - Lernzentrum Für Azubis",
+        "persona": "Schüler, Azubis und Ausbilder",
+        "channel": "Instagram",
+        "format": "reel",
+        "objective": "LFA mit dem freigegebenen Beleg einordnen.",
+        "cta": "LFA-Demo oder Ausbildungsplatz-Info anfragen",
+        "proof_sources": ["Kampagnen/kampagne_3_lfa_azubis.json"],
+        "utm": {
+          "utm_source": "instagram",
+          "utm_medium": "organic",
+          "utm_campaign": "k3_lfa"
+        },
+        "hypothesis": "Interne Testannahme.",
+        "test_variable": "hook_and_format",
+        "language": "de-DE",
+        "risk_flags": ["product_ui_and_outcome_claims_require_evidence"],
+        "trend_id": "",
+        "trend_sources": [],
+        "public_copy": "LFA ist ein digitales Lernsystem für Fachinformatiker-Azubis und Ausbilder.\n\nLFA-Demo oder Ausbildungsplatz-Info anfragen\n\n#LFA #Ausbildung #Azubis",
+        "channel_copy": {
+          "headline": "LFA für die Ausbildung einordnen",
+          "body": "",
+          "caption": "LFA ist ein digitales Lernsystem für Fachinformatiker-Azubis und Ausbilder.",
+          "cta": "LFA-Demo oder Ausbildungsplatz-Info anfragen",
+          "hashtags": ["LFA", "Ausbildung", "Azubis"],
+          "carousel_slides": []
+        },
+        "reel_output": {
+          "idea": "Typografisches 9:16-Reel mit einer Prüffrage, dem freigegebenen LFA-Beleg und einer klaren Endkarte.",
+          "format": "9:16-Typografie-Reel",
+          "hook": "Wie lässt sich ein digitales Lernsystem für Azubis und Ausbilder einordnen?",
+          "script": [
+            "LFA ist ein digitales Lernsystem für Fachinformatiker-Azubis und Ausbilder.",
+            "Welche Informationen sind für Schüler, Azubis und Ausbilder jetzt wichtig?",
+            "LFA-Demo oder Ausbildungsplatz-Info anfragen"
+          ],
+          "shot_list": [
+            "Typografische Einstiegsfrage",
+            "Freigegebene LFA-Aussage als ruhige Texttafel",
+            "Klare Endkarte mit nächstem Schritt"
+          ],
+          "on_screen_text": [
+            "Digitales Lernsystem für Fachinformatiker-Azubis",
+            "LFA-Demo oder Ausbildungsplatz-Info anfragen"
+          ],
+          "caption": "LFA ist ein digitales Lernsystem für Fachinformatiker-Azubis und Ausbilder.",
+          "cta": "LFA-Demo oder Ausbildungsplatz-Info anfragen",
+          "editing_notes": "Ruhiger Schnitt, gut lesbare Texttafeln und eine klare Endkarte."
+        },
+        "citations": [],
+        "generation": {
+          "status": "ai_generated",
+          "schema_version": "wamocon-content-v1",
+          "provider": "local_openai_compatible",
+          "model": "qwen3.5-35b-a3b",
+          "route": "local_content_primary",
+          "latency_ms": 5270,
+          "attempts": 1,
+          "fallback_used": false,
+          "fallback_reason": "",
+          "error": "",
+          "semantic_repair_used": false,
+          "validation_failures": 0,
+          "deterministic_structure_fill": false,
+          "response_id": "golden-response-k3",
+          "usage": {"input_tokens": 920, "output_tokens": 410},
+          "structured_output_mode": "json_schema"
+        }
+      }
+    },
+    {
+      "brief": {
+        "id": "golden-k4-ai",
+        "campaign_id": "k4",
+        "campaign": "Mitarbeiter",
+        "persona": "Bewerber und B2B-Entscheider",
+        "channel": "Instagram",
+        "format": "reel",
+        "objective": "Einen bedingten Produktionsplan für freigegebene Teammedien erstellen.",
+        "cta": "Team kennenlernen",
+        "proof_sources": ["Kampagnen/kampagne_4_mitarbeiter.json"],
+        "utm": {
+          "utm_source": "instagram",
+          "utm_medium": "organic",
+          "utm_campaign": "k4_team"
+        },
+        "hypothesis": "Interne Testannahme.",
+        "test_variable": "hook_and_format",
+        "language": "de-DE",
+        "risk_flags": ["people_consent_and_real_assets_required"],
+        "trend_id": "",
+        "trend_sources": [],
+        "public_copy": "WAMOCON kann Team-, Kultur- und Arbeitsalltagseinblicke für Employer Branding und Vertrauensaufbau nutzen, sofern Personenfreigaben vorliegen.\n\nTeam kennenlernen\n\n#Team #Arbeitsalltag #WAMOCON",
+        "channel_copy": {
+          "headline": "Bedingter Produktionsplan für einen Teameinblick",
+          "body": "",
+          "caption": "WAMOCON kann Team-, Kultur- und Arbeitsalltagseinblicke für Employer Branding und Vertrauensaufbau nutzen, sofern Personenfreigaben vorliegen.",
+          "cta": "Team kennenlernen",
+          "hashtags": ["Team", "Arbeitsalltag", "WAMOCON"],
+          "carousel_slides": []
+        },
+        "reel_output": {
+          "idea": "Interner 9:16-Produktionsplan mit einer Frage, einem bedingten Medienhinweis und einer Endkarte.",
+          "format": "9:16-Produktionsplan mit Platzhaltern",
+          "hook": "Wie kann ein zukünftiger Einblick in Team, Kultur und Arbeitsalltag eingeordnet werden?",
+          "script": [
+            "Geplanter Einstieg: Team, Kultur und Arbeitsalltag.",
+            "WAMOCON kann Team-, Kultur- und Arbeitsalltagseinblicke für Employer Branding und Vertrauensaufbau nutzen, sofern Personenfreigaben vorliegen.",
+            "Erst nach dokumentierten Einwilligungen: Team kennenlernen"
+          ],
+          "shot_list": [
+            "Platzhalter für die Einstiegsfrage",
+            "Reale Medien auswählen oder neu filmen und Personenfreigaben dokumentieren",
+            "Erst nach Nachweis: freigegebene Team-Szene und Endkarte"
+          ],
+          "on_screen_text": [
+            "Produktionsplan",
+            "Reale Medien und Einwilligungen erforderlich",
+            "Team kennenlernen"
+          ],
+          "caption": "WAMOCON kann Team-, Kultur- und Arbeitsalltagseinblicke für Employer Branding und Vertrauensaufbau nutzen, sofern Personenfreigaben vorliegen.",
+          "cta": "Team kennenlernen",
+          "editing_notes": "Bis reale Medien und Einwilligungen dokumentiert sind, bleibt dieser Entwurf ein interner Produktionsplan."
+        },
+        "citations": [],
+        "generation": {
+          "status": "ai_generated",
+          "schema_version": "wamocon-content-v1",
+          "provider": "local_openai_compatible",
+          "model": "qwen3.5-35b-a3b",
+          "route": "local_content_primary",
+          "latency_ms": 5440,
+          "attempts": 1,
+          "fallback_used": false,
+          "fallback_reason": "",
+          "error": "",
+          "semantic_repair_used": false,
+          "validation_failures": 0,
+          "deterministic_structure_fill": false,
+          "response_id": "golden-response-k4",
+          "usage": {"input_tokens": 980, "output_tokens": 470},
+          "structured_output_mode": "json_schema"
+        }
+      }
+    },
+    {
+      "brief": {
+        "id": "golden-k5-ai",
+        "campaign_id": "k5",
+        "campaign": "Maßgeschneiderte App-Entwicklung (50+ Portfolio)",
+        "persona": "IT-Leiter und Geschäftsführer",
+        "channel": "LinkedIn",
+        "format": "portfolio_carousel",
+        "objective": "Das freigegebene Anwendungsportfolio sachlich einordnen.",
+        "cta": "App-Modernisierungscheck anfragen",
+        "proof_sources": ["Kampagnen/kampagne_5_app_entwicklung.json"],
+        "utm": {
+          "utm_source": "linkedin",
+          "utm_medium": "organic",
+          "utm_campaign": "k5_app_portfolio"
+        },
+        "hypothesis": "Interne Testannahme.",
+        "test_variable": "hook_and_format",
+        "language": "de-DE",
+        "risk_flags": ["individual_app_examples_require_evidence"],
+        "trend_id": "",
+        "trend_sources": [],
+        "public_copy": "Ein dokumentiertes Anwendungsportfolio\n\nWAMOCON dokumentiert ein Portfolio von mehr als 50 ausgelieferten Anwendungen in sieben Kategorien. Welche Anwendung möchten IT-Leiter und Geschäftsführer zuerst prüfen?\n\nApp-Modernisierungscheck anfragen",
+        "channel_copy": {
+          "headline": "Ein dokumentiertes Anwendungsportfolio",
+          "body": "WAMOCON dokumentiert ein Portfolio von mehr als 50 ausgelieferten Anwendungen in sieben Kategorien. Welche Anwendung möchten IT-Leiter und Geschäftsführer zuerst prüfen?",
+          "caption": "",
+          "cta": "App-Modernisierungscheck anfragen",
+          "hashtags": ["Anwendungsportfolio", "ITLeitung"],
+          "carousel_slides": [
+            "Anwendungsportfolio für IT-Leiter und Geschäftsführer",
+            "WAMOCON dokumentiert ein Portfolio von mehr als 50 ausgelieferten Anwendungen in sieben Kategorien.",
+            "Welche Anwendung möchten Sie zuerst prüfen?",
+            "App-Modernisierungscheck anfragen"
+          ]
+        },
+        "reel_output": {
+          "idea": "",
+          "format": "",
+          "hook": "",
+          "script": [],
+          "shot_list": [],
+          "on_screen_text": [],
+          "caption": "",
+          "cta": "",
+          "editing_notes": ""
+        },
+        "citations": [],
+        "generation": {
+          "status": "ai_generated",
+          "schema_version": "wamocon-content-v1",
+          "provider": "local_openai_compatible",
+          "model": "qwen3.5-35b-a3b",
+          "route": "local_content_primary",
+          "latency_ms": 5010,
+          "attempts": 1,
+          "fallback_used": false,
+          "fallback_reason": "",
+          "error": "",
+          "semantic_repair_used": false,
+          "validation_failures": 0,
+          "deterministic_structure_fill": false,
+          "response_id": "golden-response-k5",
+          "usage": {"input_tokens": 910, "output_tokens": 350},
+          "structured_output_mode": "json_schema"
+        }
+      }
+    }
+  ]
+}

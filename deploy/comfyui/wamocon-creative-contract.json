@@ -1,6 +1,35 @@
 {
-  "version": "2026-06",
+  "version": "2026-07",
   "purpose": "Reusable ComfyUI creative contract for WAMOCON branded assets.",
+  "runtime_preflight": {
+    "read_only_routes": [
+      "GET /system_stats",
+      "GET /object_info/UNETLoader",
+      "GET /object_info/DualCLIPLoader",
+      "GET /object_info/VAELoader",
+      "GET /view_metadata/vae?filename=<url-encoded-name>",
+      "GET /queue",
+      "GET /history/<submitted-prompt-id>",
+      "GET /view?filename=<qualified-output>&type=output"
+    ],
+    "required": [
+      "flux1-schnell.safetensors is exposed by the pinned core UNETLoader; third-party custom loaders are forbidden.",
+      "At least two text encoders are exposed for the selected FLUX workflow.",
+      "DualCLIPLoader follows the official FLUX order: clip_name1 is t5xxl_fp8_e4m3fn.safetensors and clip_name2 is clip_l.safetensors.",
+      "The selected VAE returns readable model metadata and is not an empty placeholder.",
+      "ComfyUI reports the exact nonempty package set required by the full pinned core commit, with no missing, extra, or mismatched package.",
+      "The API-format workflow validates before any production queue submission.",
+      "The isolated loopback queue is empty before a governed job is submitted.",
+      "The candidate root, Git checkout, and all four model files resolve without symbolic links.",
+      "Each local model is streamed against its actual file SHA-256; an informational Xet CAS hash cannot satisfy this check.",
+      "Fresh history is bound to the runtime identity, four model hashes, exact graph, seed, and fetched output bytes."
+    ],
+    "candidate_manifest": "deploy/comfyui/flux-schnell-candidate-manifest.json",
+    "pinned_workflow_sha256": "10a93745478a805b01c36827c9168bc995098fcba460b9dc8fd0dadabe6efe76",
+    "workflow_qualification_is_separate": true,
+    "human_visual_approval_is_separate": true,
+    "automated_visual_approval_allowed": false
+  },
   "inputs": {
     "campaign": "K1|K2|K3|K4|K5",
     "channel": "LinkedIn|Instagram|YouTube",
@@ -23,6 +52,12 @@
     "asset_path": "internal object storage path",
     "ai_generated_media": true,
     "review_required": true,
-    "source_workflow_hash": "sha256 of pinned ComfyUI workflow"
+    "source_workflow_hash": "sha256 of pinned ComfyUI API-format workflow",
+    "model_hashes": ["sha256 of diffusion model, text encoders, and VAE"],
+    "seed": "recorded integer seed",
+    "prompt_id": "ComfyUI queue identifier",
+    "generated_at": "UTC ISO-8601 timestamp",
+    "technical_qualification_release_ready": false,
+    "human_visual_approval": "separate named-reviewer evidence; never set by the qualification script"
   }
 }

@@ -53,20 +53,41 @@ class ContentBrief:
     utm: dict[str, str]
     hypothesis: str
     test_variable: str
+    content_mode: str = ""
+    campaign_id: str = ""
+    campaign_context: dict[str, Any] = field(default_factory=dict)
     language: str = "de-DE"
     status: ContentStatus = ContentStatus.DRAFTING
     risk_flags: list[str] = field(default_factory=list)
     hashtags: list[str] = field(default_factory=list)
+    trend_run_id: str = ""
     trend_id: str = ""
     trend_summary: str = ""
     trend_sources: list[str] = field(default_factory=list)
+    trend_verification_status: str = ""
     reel_concept: dict[str, Any] = field(default_factory=dict)
     user_prompt: str = ""
     draft: str = ""
     public_copy: str = ""
+    channel_copy: dict[str, Any] = field(default_factory=dict)
+    reel_output: dict[str, Any] = field(default_factory=dict)
+    citations: list[dict[str, Any]] = field(default_factory=list)
+    generation: dict[str, Any] = field(default_factory=dict)
+    quality_evaluation: dict[str, Any] = field(default_factory=dict)
     review_notes: list[str] = field(default_factory=list)
     created_at: str = field(default_factory=utc_now)
     updated_at: str = field(default_factory=utc_now)
+
+    def __post_init__(self) -> None:
+        """Derive an explicit mode for legacy stored briefs only.
+
+        New intake paths set ``content_mode`` explicitly. Older states predate
+        the field, so their existing server-stored trend identifier is the
+        only safe migration signal.
+        """
+
+        normalized = str(self.content_mode or "").strip().casefold()
+        self.content_mode = normalized or ("current_trend" if self.trend_id else "evergreen")
 
     def validate(self) -> list[str]:
         errors: list[str] = []
@@ -90,6 +111,20 @@ class ContentBrief:
                 errors.append(f"{utm_key} is required")
         if not self.proof_sources:
             errors.append("at least one proof source is required")
+        if self.content_mode not in {"evergreen", "current_trend"}:
+            errors.append("content_mode must be evergreen or current_trend")
+        trend_fields_present = bool(
+            self.trend_run_id
+            or self.trend_id
+            or self.trend_summary
+            or self.trend_sources
+            or self.trend_verification_status
+            or self.citations
+        )
+        if self.content_mode == "evergreen" and trend_fields_present:
+            errors.append("evergreen content must not carry trend provenance")
+        if self.content_mode == "current_trend" and not self.trend_id:
+            errors.append("current_trend content requires stored trend provenance")
         if self.channel.lower() == "instagram" and len(self.hashtags) > 5:
             errors.append("instagram posts must use no more than 5 hashtags")
         errors.extend(german_market_language_errors(self))
@@ -145,6 +180,15 @@ class PerformanceRecord:
     pipeline_value_eur: float = 0.0
     landing_page_visits: int = 0
     landing_page_conversions: int = 0
+    source_system: str = ""
+    source_ref: str = ""
+    period_start: str = ""
+    period_end: str = ""
+    retrieved_at: str = field(default_factory=utc_now)
+    operator: str = ""
+    attribution_rule: str = ""
+    snapshot_sha256: str = ""
+    evidence: list[dict[str, Any]] = field(default_factory=list)
     created_at: str = field(default_factory=utc_now)
 
     @property
@@ -166,11 +210,19 @@ class PerformanceRecord:
 class LeadRecord:
     id: str
     source_content_id: str
+    campaign_id: str
     campaign: str
     offer: str
     persona: str
     utm: dict[str, str]
     consent_given: bool
+    consent_at: str
+    privacy_notice_version: str
+    consent_source: str
+    consent_proof_ref: str
+    consent_purposes: list[str]
+    retention_policy: str
+    retention_expires_at: str
     company: str = ""
     email: str = ""
     contact_name: str = ""

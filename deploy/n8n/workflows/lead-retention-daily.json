@@ -1,0 +1,124 @@
+{
+  "id": "WMCLeadRetention01",
+  "name": "WAMOCON Lead Retention - Daily Local Anonymization (Staged)",
+  "active": false,
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "20 2 * * *"
+            }
+          ]
+        }
+      },
+      "id": "daily-retention-schedule",
+      "name": "Daily 02:20 retention check",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1,
+      "position": [220, 300]
+    },
+    {
+      "parameters": {
+        "url": "http://wmc-marketing-agent:8080/workflows/leads/retention-due",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth"
+      },
+      "id": "discover-expired-leads",
+      "name": "Discover expired local lead records (read only)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [500, 300],
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 3000,
+      "onError": "stopWorkflow",
+      "credentials": {
+        "httpHeaderAuth": {
+          "name": "WAMOCON Agent Access Token"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "items",
+        "options": {}
+      },
+      "id": "split-due-leads",
+      "name": "Process each expired lead",
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [780, 300]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://wmc-marketing-agent:8080/workflows/lead-lifecycle",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ { lead_id: $json.lead_id, action: 'expire_retention', operator: 'automation:n8n-retention', reason_code: 'retention_expired', occurred_at: $now.toUTC().toISO(), effective_expiry_at: $json.effective_expiry_at } }}",
+        "options": {
+          "timeout": 30000
+        }
+      },
+      "id": "expire-local-retention",
+      "name": "Anonymize expired local record",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [1060, 300],
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 3000,
+      "onError": "stopWorkflow",
+      "credentials": {
+        "httpHeaderAuth": {
+          "name": "WAMOCON Agent Access Token"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Daily 02:20 retention check": {
+      "main": [
+        [
+          {
+            "node": "Discover expired local lead records (read only)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Discover expired local lead records (read only)": {
+      "main": [
+        [
+          {
+            "node": "Process each expired lead",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Process each expired lead": {
+      "main": [
+        [
+          {
+            "node": "Anonymize expired local record",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "saveDataErrorExecution": "all",
+    "saveDataSuccessExecution": "none"
+  }
+}

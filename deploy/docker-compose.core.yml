@@ -1,73 +1,11 @@
-services:
-  postgres:
-    image: postgres:16
-    environment:
-      POSTGRES_DB: marketing_machine
-      POSTGRES_USER: marketing
-      POSTGRES_PASSWORD: marketing
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-      - ../db/schema.sql:/docker-entrypoint-initdb.d/001-schema.sql:ro
-    ports:
-      - "5432:5432"
-
-  redis:
-    image: redis:7
-    ports:
-      - "6379:6379"
-
-  marketing-agent:
-    build:
-      context: ..
-      dockerfile: Dockerfile
-    env_file:
-      - ../config/integrations.example.env
-    depends_on:
-      - postgres
-      - redis
-    ports:
-      - "8080:8080"
-
-  n8n:
-    image: n8nio/n8n:latest
-    environment:
-      DB_TYPE: postgresdb
-      DB_POSTGRESDB_HOST: postgres
-      DB_POSTGRESDB_PORT: 5432
-      DB_POSTGRESDB_DATABASE: marketing_machine
-      DB_POSTGRESDB_USER: marketing
-      DB_POSTGRESDB_PASSWORD: marketing
-      QUEUE_BULL_REDIS_HOST: redis
-      EXECUTIONS_MODE: queue
-      N8N_ENCRYPTION_KEY: replace-with-secret-manager-value
-      N8N_HOST: localhost
-      N8N_PORT: 5678
-      WEBHOOK_URL: http://localhost:5678/
-    depends_on:
-      - postgres
-      - redis
-    ports:
-      - "5678:5678"
-    volumes:
-      - n8n_data:/home/node/.n8n
-
-  n8n-worker:
-    image: n8nio/n8n:latest
-    command: worker
-    environment:
-      DB_TYPE: postgresdb
-      DB_POSTGRESDB_HOST: postgres
-      DB_POSTGRESDB_PORT: 5432
-      DB_POSTGRESDB_DATABASE: marketing_machine
-      DB_POSTGRESDB_USER: marketing
-      DB_POSTGRESDB_PASSWORD: marketing
-      QUEUE_BULL_REDIS_HOST: redis
-      EXECUTIONS_MODE: queue
-      N8N_ENCRYPTION_KEY: replace-with-secret-manager-value
-    depends_on:
-      - postgres
-      - redis
-
-volumes:
-  postgres_data:
-  n8n_data:
+# RETIRED: this filename is retained only to make old operator notes fail safe.
+#
+# Do not add services here. Use:
+#   - deploy/docker-compose.existing-stack.yml for the marketing agent
+#   - deploy/n8n/core-stack.release1-postgres.yml for the first n8n migration
+#   - deploy/n8n/core-stack.release2-queue.yml only after release 1 is stable
+#
+# `docker compose -f deploy/docker-compose.core.yml up` intentionally starts
+# nothing instead of recreating the former public databases and second n8n.
+name: wamocon-retired-core-compose
+services: {}

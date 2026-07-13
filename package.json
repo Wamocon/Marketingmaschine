@@ -1,8 +1,11 @@
 {
   "scripts": {
+    "smoke:a11y": "node scripts/accessibility_smoke.js",
+    "smoke:dashboard": "node scripts/dashboard_visual_smoke.js",
     "smoke:trend-studio": "node scripts/trend_studio_user_flow_smoke.js"
   },
   "devDependencies": {
-    "playwright": "^1.61.1"
+    "@axe-core/playwright": "4.12.1",
+    "playwright": "1.61.1"
   }
 }

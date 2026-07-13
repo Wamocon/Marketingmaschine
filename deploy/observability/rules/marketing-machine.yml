@@ -1,0 +1,38 @@
+groups:
+  - name: wamocon-marketing-machine
+    rules:
+      - alert: MarketingMachineUnavailable
+        expr: up{job="wamocon-marketing-machine"} == 0
+        for: 2m
+        labels:
+          severity: critical
+        annotations:
+          summary: Marketing control room is unavailable
+          description: Prometheus has been unable to scrape the marketing agent for two minutes.
+
+      - alert: MarketingReviewQueueGrowing
+        expr: marketing_machine_review_attention_items > 10
+        for: 30m
+        labels:
+          severity: warning
+        annotations:
+          summary: Marketing review queue needs attention
+          description: More than ten drafts have needed human attention for at least 30 minutes.
+
+      - alert: MarketingAIGenerationStale
+        expr: marketing_machine_last_ai_generation_timestamp_seconds > 0 and (time() - marketing_machine_last_ai_generation_timestamp_seconds) > 172800
+        for: 30m
+        labels:
+          severity: warning
+        annotations:
+          summary: No recent successful AI content generation
+          description: The latest stored AI-generated content is more than 48 hours old.
+
+      - alert: MarketingCampaignCatalogUnexpected
+        expr: marketing_machine_campaign_catalog_total != 5 or marketing_machine_campaign_catalog_load_error == 1
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: Canonical campaign catalog changed
+          description: The production product must expose exactly the five approved campaigns.

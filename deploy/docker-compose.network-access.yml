@@ -1,12 +1,32 @@
 services:
   wmc-marketing-access:
-    image: nginx:1.27-alpine
+    image: nginx:1.30.3-alpine@sha256:0d3b80406a13a767339fbe2f41406d6c7da727ab89cf8fae399e81f780f814d1
     container_name: wmc-marketing-access
     restart: unless-stopped
+    entrypoint: ["/bin/sh", "/wamocon-entrypoint.sh"]
+    environment:
+      MARKETING_MUTATION_TOKEN_FILE: /run/secrets/marketing_mutation_token
+      MARKETING_EDGE_ATTESTATION_FILE: /run/secrets/marketing_edge_attestation
+      MARKETING_OPERATOR_HTPASSWD_FILE: /run/secrets/marketing_operator_htpasswd
+      MARKETING_TLS_CERTIFICATE_FILE: /run/secrets/marketing_tls_certificate
+      MARKETING_TLS_PRIVATE_KEY_FILE: /run/secrets/marketing_tls_private_key
+      MARKETING_MACHINE_ALLOWED_HOSTS: ${MARKETING_MACHINE_ALLOWED_HOSTS:?Set exact comma-separated TLS hostnames or LAN IP addresses}
+      MARKETING_MACHINE_ALLOWED_CLIENT_CIDRS: ${MARKETING_MACHINE_ALLOWED_CLIENT_CIDRS:?Set approved operator IP addresses or CIDRs}
+      MARKETING_COMFYUI_UPSTREAM: ${MARKETING_COMFYUI_UPSTREAM:?Set the approved private ComfyUI host and port}
     extra_hosts:
       - "host.docker.internal:host-gateway"
     volumes:
-      - ./network-access/nginx.conf:/etc/nginx/conf.d/default.conf:ro
+      - ./network-access/nginx.conf:/etc/wamocon/default.conf.template:ro
+      - ./network-access/entrypoint.sh:/wamocon-entrypoint.sh:ro
+    # Generated nginx maps contain edge attestations. Keep them only in RAM.
+    tmpfs:
+      - /etc/nginx/conf.d:rw,noexec,nosuid,nodev,size=2m,mode=0700
+    secrets:
+      - marketing_mutation_token
+      - marketing_edge_attestation
+      - marketing_operator_htpasswd
+      - marketing_tls_certificate
+      - marketing_tls_private_key
     ports:
       - "0.0.0.0:18117:8117"
       - "0.0.0.0:15678:5678"
@@ -17,11 +37,22 @@ services:
       - "0.0.0.0:13030:3030"
     networks:
       - core-net
-      - growth-net
+      - shared-network
 
 networks:
   core-net:
     external: true
-  growth-net:
+  shared-network:
     external: true
-    name: wmc-marketing-growth
+
+secrets:
+  marketing_mutation_token:
+    file: ./secrets/marketing_mutation_token
+  marketing_edge_attestation:
+    file: ./secrets/marketing_edge_attestation
+  marketing_operator_htpasswd:
+    file: ./secrets/marketing_operator_htpasswd
+  marketing_tls_certificate:
+    file: ./secrets/marketing_tls_certificate.pem
+  marketing_tls_private_key:
+    file: ./secrets/marketing_tls_private_key.pem

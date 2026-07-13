@@ -1,0 +1,11 @@
+apiVersion: 1
+
+providers:
+  - name: WAMOCON operations
+    folder: WAMOCON Operations
+    type: file
+    disableDeletion: false
+    updateIntervalSeconds: 30
+    allowUiUpdates: false
+    options:
+      path: /etc/grafana/provisioning/dashboards

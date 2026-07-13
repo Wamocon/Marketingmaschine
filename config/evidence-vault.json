@@ -21,7 +21,7 @@
     },
     {
       "id": "Kampagnen/kampagne_3_lfa_azubis.json",
-      "claim": "LFA positioniert strukturierte Fachinformatiker-Ausbildung und ein digitales Lernsystem fuer Azubis und Ausbilder.",
+      "claim": "LFA ist ein digitales Lernsystem für Fachinformatiker-Azubis und Ausbilder.",
       "source_type": "internal_campaign_brief",
       "source_ref": "Kampagnen/kampagne_3_lfa_azubis.json",
       "approved_for_public_use": true,
@@ -30,7 +30,7 @@
     },
     {
       "id": "Kampagnen/kampagne_4_mitarbeiter.json",
-      "claim": "WAMOCON kann Team-, Kultur- und Arbeitsalltagseinblicke fuer Employer Branding und Vertrauensaufbau nutzen, sofern Personenfreigaben vorliegen.",
+      "claim": "WAMOCON kann Team-, Kultur- und Arbeitsalltagseinblicke für Employer Branding und Vertrauensaufbau nutzen, sofern Personenfreigaben vorliegen.",
       "source_type": "internal_campaign_brief",
       "source_ref": "Kampagnen/kampagne_4_mitarbeiter.json",
       "approved_for_public_use": true,
@@ -39,7 +39,7 @@
     },
     {
       "id": "Kampagnen/kampagne_5_app_entwicklung.json",
-      "claim": "WAMOCON kann interne Apps und Modernisierungspotenziale anhand vorhandener App-Portfolio-Nachweise strukturieren.",
+      "claim": "WAMOCON dokumentiert ein Portfolio von mehr als 50 ausgelieferten Anwendungen in sieben Kategorien.",
       "source_type": "internal_campaign_brief",
       "source_ref": "Kampagnen/kampagne_5_app_entwicklung.json",
       "approved_for_public_use": true,

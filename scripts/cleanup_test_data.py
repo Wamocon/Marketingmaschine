@@ -67,6 +67,10 @@ def cleanup_jsonl(path: Path, prefixes: tuple[str, ...], apply: bool) -> tuple[i
 
 
 def cleanup(root: Path, prefixes: tuple[str, ...], apply: bool) -> dict[str, Any]:
+    if apply:
+        raise RuntimeError(
+            "in-place runtime cleanup is retired; never rewrite active audit JSONL files"
+        )
     runtime_root = safe_runtime_root(root)
     removed_states = cleanup_states(runtime_root, prefixes, apply)
     jsonl_results = []
@@ -88,7 +92,7 @@ def main() -> int:
     parser = argparse.ArgumentParser(description="Safely remove mock/smoke test data from runtime-data.")
     parser.add_argument("--root", default="runtime-data", help="Runtime data directory containing states/events/performance/leads/outbox.")
     parser.add_argument("--prefix", action="append", dest="prefixes", help="Content-id prefix to remove. Can be repeated.")
-    parser.add_argument("--apply", action="store_true", help="Actually delete/rewrite files. Without this, only reports.")
+    parser.add_argument("--apply", action="store_true", help="Retired safety trap: always refuses in-place deletion.")
     args = parser.parse_args()
 
     prefixes = tuple(args.prefixes or DEFAULT_PREFIXES)

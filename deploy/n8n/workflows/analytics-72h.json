@@ -1,5 +1,6 @@
 {
-  "name": "WAMOCON 72h Analytics Review",
+  "id": "eTZSmmzKe6dJ1knR",
+  "name": "WAMOCON 72h Due Discovery (Read Only)",
   "active": true,
   "nodes": [
     {
@@ -7,45 +8,46 @@
         "rule": {
           "interval": [
             {
-              "field": "hours",
-              "hoursInterval": 24
+              "field": "cronExpression",
+              "expression": "0 7 * * *"
             }
           ]
         }
       },
       "id": "daily-schedule",
-      "name": "Daily analytics check",
+      "name": "Daily 07:00 discovery",
       "type": "n8n-nodes-base.scheduleTrigger",
       "typeVersion": 1,
       "position": [240, 300]
     },
     {
       "parameters": {
-        "method": "POST",
-        "url": "http://wmc-marketing-agent:8080/workflows/analytics-review",
-        "sendBody": true,
-        "bodyParameters": {
-          "parameters": [
-            {
-              "name": "review_window",
-              "value": "72h"
-            }
-          ]
-        }
+        "url": "http://wmc-marketing-agent:8080/workflows/analytics/due?review_window=72h",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth"
       },
       "id": "call-agent",
-      "name": "Evaluate 72h signals",
+      "name": "Discover content due for 72h review (read only)",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4,
-      "position": [520, 300]
+      "position": [520, 300],
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 3000,
+      "onError": "stopWorkflow",
+      "credentials": {
+        "httpHeaderAuth": {
+          "name": "WAMOCON Agent Access Token"
+        }
+      }
     }
   ],
   "connections": {
-    "Daily analytics check": {
+    "Daily 07:00 discovery": {
       "main": [
         [
           {
-            "node": "Evaluate 72h signals",
+            "node": "Discover content due for 72h review (read only)",
             "type": "main",
             "index": 0
           }

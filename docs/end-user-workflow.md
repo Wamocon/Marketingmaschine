@@ -1,195 +1,217 @@
-# End-User Workflow
+# Marketing-Konsole: Arbeitsablauf für Anwender
 
-Use the Marketing Console first:
+Diese Anleitung richtet sich an Marketing-Mitarbeitende ohne technischen Hintergrund. Die Konsole führt durch Recherche, Content-Auswahl und Freigabe. Sie veröffentlicht nichts automatisch.
 
-```text
-http://192.168.178.75:18117/ui
-```
+## Konsole öffnen
 
-## What The Two n8n Pipelines Mean
-
-`WAMOCON Marketing - Manual Content Intake`
-
-- Starts a new content item from a campaign brief.
-- Requires campaign, persona, channel, objective, CTA, proof source, UTM, hypothesis, and test variable.
-- Creates a draft state.
-- Stops at human review.
-- Does not publish.
-
-`WAMOCON Marketing - Human Approval`
-
-- Takes an existing content ID.
-- Records the human review decision.
-- Requires brand score, fact check, privacy check, and AI disclosure check.
-- Creates a draft-only scheduler payload only when all approval checks pass.
-- Still requires final approval inside Postiz or the publishing platform.
-
-## Simple Browser Procedure
-
-1. Open `http://192.168.178.75:18117/ui`.
-2. Use `Intake`.
-3. Choose a preset campaign or custom.
-4. Keep `AI draft language` on `Deutsch (Deutschland)` for the German market, or switch to English only for a non-German campaign.
-5. Enter the content idea, offer, proof source, CTA, UTM fields, and hypothesis.
-6. Click `Create Draft`.
-7. Read `Created Post Preview` for the generated public post copy.
-8. Read the generated draft state and fix any blocked fields.
-9. Open `Approval`.
-10. Select or paste the content ID.
-11. Approve only after proof, consent, privacy, and brand checks pass.
-12. Use `Scheduler Draft Preview` as the draft copy for Postiz.
-13. Use `Leads` when a person or company reacts, fills a form, or asks for the offer.
-14. Use `Routing` to prepare the approved draft for Postiz or a qualified lead for Twenty/Mautic.
-15. Use `Analytics` after 72 hours, 7 days, 14 days, and 30 days.
-16. Use `Creative` to create ComfyUI-ready visual briefs.
-17. Use `Phases` for the morning readiness check before relying on the full pipeline.
-
-## Where Created Content Is Saved
-
-In the browser:
-
-- `Dashboard` shows recent content states.
-- `Recent Content` in the left sidebar lists saved content IDs.
-- Clicking a recent item opens it in `Approval` and fills the post preview.
-- `Created Post Preview` shows the generated public draft before approval.
-- `Scheduler Draft Preview` shows the approved draft-only scheduler copy after approval.
-- `Lead Intake` shows the lead score, next action, CRM payload, and Mautic payload.
-- `Routing Outbox` shows prepared, blocked, sent, or failed external handoff records.
-- `Phase Readiness` shows complete, partial, and blocked implementation phases.
-
-On Nvidia-1:
+Die unveränderte Altversion wurde am 13. Juli zuletzt über unverschlüsseltes
+HTTP beobachtet. Beim abschließenden Bürocheck war Nvidia-1 nicht mehr
+erreichbar. Öffnen Sie deshalb keine Konsole, bis die IT die Verbindung und den
+zulässigen Lesebetrieb ausdrücklich bestätigt. Die geschützte Referenz der
+Altversion lautet:
 
 ```text
-/home/wamocon/lokal-ai-stack/marketing/wamocon-marketing-machine/runtime-data/states/
-/home/wamocon/lokal-ai-stack/marketing/wamocon-marketing-machine/runtime-data/leads/
-/home/wamocon/lokal-ai-stack/marketing/wamocon-marketing-machine/runtime-data/outbox/
+<LEGACY-CONSOLE-URL>
 ```
 
-Approved items include a `scheduler_payload.copy` field. This is the draft-only public copy to review and then move into Postiz.
+Geben Sie an diesem vorübergehenden HTTP-Endpunkt keine neuen Zugangsdaten ein.
+Erst nach der bestätigten Umstellung öffnen Sie die normale Konsole unter:
 
-## Clean Old Test Data And Create Fresh Mock Results
-
-Use this only for mock/smoke test records. It keeps real campaign records like `k1-qa-risk-audit-weekly`.
-
-Preview what would be deleted:
-
-```bash
-python3 scripts/clean_test_data.py --root runtime-data --dry-run
+```text
+<KONSOLEN-URL>
 ```
 
-Delete only `mock-*` and `smoke-*` records:
+Nach der Umstellung darf die HTTP-Adresse keine nutzbare Konsole mehr anzeigen.
+Eine Zertifikatswarnung an der HTTPS-Adresse ist kein akzeptabler
+Normalzustand; melden Sie sie der IT, statt sie zu umgehen.
 
-```bash
-python3 scripts/clean_test_data.py --root runtime-data --confirm delete-test-data
-```
+Die folgenden Arbeitsschritte gelten für die gehärtete Konsole nach der
+bestätigten Umstellung. Verwenden Sie die alte HTTP-Version bis dahin nur für
+den ausdrücklich freigegebenen Bestandsschutz; erstellen oder genehmigen Sie
+dort keine neuen Inhalte.
 
-Create fresh mock results:
+Die gehärtete Konsole arbeitet ausschließlich mit diesen fünf echten Kampagnen:
 
-```bash
-python3 scripts/mock_pipeline_test.py --base-url http://127.0.0.1:8117 --n8n-url http://127.0.0.1:5678
-```
+- **K1:** Consulting Test- und Qualitätsmanagement
+- **K2:** KI (Sokrates)
+- **K3:** LFA – Lernzentrum für Azubis
+- **K4:** Mitarbeiter / Arbeitgebermarke
+- **K5:** Maßgeschneiderte App-Entwicklung (50+ Portfolio)
 
-The test output includes `created_content_ids`, `fresh_result_urls`, and `approved_state_url`. Open the UI, search that content ID in `Recent Content`, then click it to see the actual generated post and scheduler draft.
+Demo-, Mock- und Smoke-Test-Inhalte sind in der normalen Ansicht ausgeblendet.
 
-## How To Add A Lead
+## Der normale Weg zum freigabefähigen Entwurf
 
-Use this when someone responds to the campaign, submits a landing form, writes a message, or asks for the offer.
+### 1. Übersicht prüfen
 
-1. Open `Leads`.
-2. Paste or select the `Source content ID`.
-3. Enter the campaign, offer, persona, company, email or phone, and the message.
-4. Tick consent only when follow-up consent is documented.
-5. Keep the UTM fields from the post or landing page.
-6. Click `Score Lead`.
-7. Read `Lead Result`.
-8. If it says `sales_follow_up`, use the CRM payload for Twenty/HubSpot and the Mautic payload for nurture.
-9. If it says `consent_required`, do not route it to CRM or marketing automation.
-10. If it says `manual_source_review`, fix the source content ID before counting it as campaign value.
+Die **Übersicht** ist Ihr täglicher Startpunkt. Sie zeigt:
 
-## How To Route To Tools
+- den Status der fünf Kampagnen,
+- den Fortschritt zum Wochenziel,
+- wartende Freigaben oder Blocker,
+- die Quellenlage und
+- den jeweils nächsten sinnvollen Schritt.
 
-Use `Routing` only after a draft is approved or a lead is qualified.
+Öffnen Sie zuerst die oberste Aufgabe. Wenn eine Kampagne „Live-Quellen fehlen“ oder „Quellenprüfung nötig“ meldet, starten Sie vor einer aktuellen Aussage eine neue Recherche.
 
-1. Open `Routing`.
-2. For a post, paste the approved content ID and click `Prepare Postiz Draft`.
-3. For a lead, paste the lead ID, choose `Twenty CRM` or `Mautic nurture`, and click `Prepare Lead Route`.
-4. Keep `Dry-run only` checked until real endpoint paths and tokens are configured.
-5. Check `Route Result`.
-6. Check `Recent Outbox`.
-7. If status is `prepared`, the payload is ready but not sent.
-8. If status is `blocked`, fix approval, consent, or source data first.
-9. If live writes are later enabled, status can become `sent` or `failed`.
+### 2. Kampagne verstehen
 
-Real external writes require all of these:
+Unter **Kampagnen** sehen Sie Ziel, Zielgruppe, Angebot, Laufzeit, Kanäle, Content-Mix und Fortschritt. Diese Angaben kommen aus den fünf Kampagnendateien und werden im Content Studio automatisch übernommen.
 
-- `MARKETING_MACHINE_ENABLE_EXTERNAL_WRITES=true`.
-- A target base URL.
-- A target endpoint path, for example `POSTIZ_CREATE_DRAFT_PATH`.
-- A target API token.
-- Human approval already recorded in this system.
+Der Status wird aus den Kampagnendaten und dem aktuellen Datum abgeleitet. Am 13. Juli 2026 sind K1, K2 und K4 aktiv; K3 und K5 starten planmäßig am 1. August 2026. Das wirksame Wochenziel beträgt deshalb heute 9 Inhalte. Die geplanten Kampagnen werden gezeigt, zählen aber bis zu ihrem Start nicht als Rückstand.
 
-## What To Put In A Campaign Brief
+### 3. Im Content Studio recherchieren
 
-Required:
+Öffnen Sie **Content Studio** und bearbeiten Sie die vier Schritte der Reihe nach:
 
-- Campaign name, for example `K1 QA Consulting`.
-- Persona, for example `IT-Leiter Thomas`.
-- Channel, for example `LinkedIn`.
-- Format, for example `expert_post`.
-- AI draft language, normally `Deutsch (Deutschland)` for WAMOCON's German market.
-- Objective, for example `QA-Risikoaudit mit senioriger Testexpertise und belegbaren Prüfpunkten anbieten`.
-- CTA, for example `QA-Risikoaudit anfragen`.
-- Proof source, for example `Kampagnen/kampagne_1_consulting_qa.json`.
-- UTM source, medium, and campaign.
-- Hypothesis, for example `Ein nachweisbasierter QA-Beitrag erzeugt qualifizierte Anfragen von IT-Leitern`.
-- Test variable, for example `offer`, `hook`, `format`, `persona`, `cta`, or `landing_page`.
+1. Wählen Sie genau eine Kampagne.
+2. Starten Sie die Recherche in öffentlichen Quellen.
+3. Vergleichen Sie vier quellenbasierte redaktionelle Richtungen.
+4. Wählen Sie eine Richtung aus und lassen Sie daraus bewusst den vollständigen Entwurf mit der lokalen KI erstellen.
 
-Rules:
+Für die Recherche ist SearxNG aktiv. Firecrawl wird zusätzlich genutzt, sobald entweder ein gültiger Cloud-Schlüssel oder ein ausdrücklich freigegebener privater Firecrawl-Dienst eingerichtet und in einem echten Suchlauf geprüft wurde.
 
-- Do not use a claim without a proof source.
-- Use German by default for German-market campaigns. Switch to English only when the campaign is intentionally international.
-- Do not use customer, employee, or applicant material without consent.
-- Instagram should use 3 to 5 focused hashtags.
-- Do not approve content when brand score is below 90.
-- Do not treat scheduler payload as public approval.
+Ein Ergebnis gilt nur dann als aktueller, verwendbarer Trend, wenn:
 
-## Edge Cases
+- mindestens zwei voneinander unabhängige Domains die Aussage stützen und
+- mindestens eine Quelle ein aktuelles Datum im gewählten Suchzeitraum besitzt.
 
-- Missing proof source: blocked.
-- Unapproved proof source: blocked.
-- English marketing copy in a German brief: blocked.
-- Too many Instagram hashtags: blocked.
-- Bad content ID during approval: rejected with a clear 404 error.
-- Weak approval: routed to revision, not scheduler.
-- Approved content: creates draft-only scheduler payload.
-- Created public copy: visible in `Created Post Preview` and, after approval, in `Scheduler Draft Preview`.
-- Good lead with consent: scored and prepared for CRM follow-up.
-- Missing lead consent: stored for audit, but CRM and marketing routing are blocked.
-- Unknown source content ID: lead is stored, but marked for manual source review.
-- Invalid lead email: rejected.
-- Approved draft route: prepared for Postiz as draft-only, dry-run by default.
-- Unapproved draft route: blocked.
-- Qualified lead route: prepared for Twenty/Mautic, dry-run by default.
-- No-consent lead route: blocked.
-- High clicks but no leads: fix landing page.
-- High engagement but no B2B leads: fix audience or offer.
-- No business value after 30 days: stop or pivot.
-- Good qualified leads after 30 days: scale.
+Jede externe Quelle wird mit Titel, Domain, Datum, Auszug und Link angezeigt. Öffnen Sie die Links und prüfen Sie, ob die Quelle tatsächlich die Aussage belegt. Wenn die Anforderungen nicht erfüllt sind, bleibt die Weiterleitung gesperrt. Verwenden Sie ein solches Ergebnis höchstens als Evergreen-Idee, nicht als aktuellen Trend.
 
-## Current Phase Reality
+### 4. Content-Richtungen vergleichen und bewusst auswählen
 
-Complete now:
+Nach Auswahl eines verifizierten Trends können Sie optional eine redaktionelle Richtung ergänzen, zum Beispiel „sachlicher“, „mehr Bildschirmaufnahme“ oder „stärkeres Q&A“.
 
-- Content intake, proof gate, German-market draft, human approval, and scheduler draft payload.
-- Governance checks for proof, consent, privacy, approval, and Instagram hashtag limits.
-- Lead intake, consent guard, qualification scoring, CRM/Mautic payload contract.
-- Analytics decisions for 72h, 7d, 14d, and 30d.
-- n8n workflow files for weekly planning and all analytics review windows.
-- Browser UI for intake, approval, leads, routing, analytics, creative briefs, status, and phases.
+Die vier Richtungen enthalten jeweils:
 
-Partial until final credentials or production services are explicitly enabled:
+- Idee und Format,
+- Hook,
+- Ablauf oder Kernpunkte,
+- visuelle Richtung,
+- Caption-Richtung,
+- CTA und
+- die zugehörigen Quellen.
 
-- Postiz/Twenty/Mautic live writes are dry-run only.
-- ComfyUI creates workflow briefs but does not auto-submit generation jobs.
-- Kimi is optional backup only and must pass API authentication before use.
-- LangGraph and MCP are scaffolded/configured but not yet the durable production runtime and gateway.
+Vergleichen Sie die Richtungen vollständig. Klicken Sie dann ausdrücklich auf die gewünschte Richtung und anschließend auf **Mit lokaler KI als Entwurf erstellen**. Erst dieser Schritt erzeugt den vollständigen Fachbeitrag, das Carousel oder den Reel-Produktionsplan im verbindlichen Kampagnenformat. Wenn die lokale KI keinen erfolgreich geprüften Entwurf liefert, bleibt der Inhalt gesperrt und erscheint nicht als freigabefähig.
+
+### 5. Entwurf unter Freigaben prüfen
+
+Öffnen Sie **Freigaben** und wählen Sie den wartenden Entwurf. Prüfen Sie den öffentlichen Text, Produktionsplan, Quellen und Hinweise. Unter **Entstehung** sehen Sie in einfacher Sprache, ob der Entwurf erfolgreich mit der lokalen KI erstellt wurde. Technische Modellnamen und Laufzeitdaten gehören nicht in Ihre Entscheidung.
+
+Eine Freigabe benötigt immer:
+
+- den Namen der prüfenden Person,
+- einen Markenfit von mindestens 90 von 100,
+- eine bestätigte Fakten- und Quellenprüfung,
+- eine bestätigte Datenschutz- und Einwilligungsprüfung,
+- eine bestätigte Prüfung der KI-Kennzeichnung und
+- eine kurze, nachvollziehbare Notiz.
+
+Markieren Sie eine Prüfung nur, wenn Sie sie tatsächlich durchgeführt haben. Ein erreichbarer Link allein ist kein Faktenbeleg. Personen, Kundendaten, Mitarbeiterdaten und Bewerbermaterial dürfen nur mit dokumentierter Einwilligung verwendet werden.
+
+Wählen Sie **Überarbeiten**, wenn Hook, Aussage, Ton, Quelle, Visual oder CTA nicht stimmen. Tragen Sie danach Bearbeiter/in und konkrete Änderungswünsche ein. Die lokale KI erstellt eine neue Versions-ID wie `…-r1`; der alte Entwurf und seine Prüfung bleiben im Audit-Verlauf erhalten.
+
+Wählen Sie **Freigeben** nur, wenn alle Pflichtprüfungen bestanden sind. Die Freigabe erzeugt höchstens einen Scheduler-Entwurf. Sie ist keine automatische Veröffentlichung und ersetzt nicht die finale Kontrolle im Publishing-Werkzeug.
+
+Für K4 und andere Inhalte mit erkennbaren Personen gilt zusätzlich: Laden Sie das finale Video zuerst in den vorgesehenen Postiz-Medienpfad hoch, kopieren Sie die dortige Medienreferenz und den direkten Link, und wählen Sie im Freigabeformular genau dieselbe lokale Originaldatei aus. Die Konsole vergleicht die lokale Datei automatisch mit dem Medium an genau diesem Postiz-Link; sie lädt die Originaldatei nicht in die Marketing-Konsole hoch. Vor der späteren Entwurfsübergabe wird dieser Vergleich wiederholt. Ein geänderter, umgeleiteter, nicht erreichbarer oder abweichender Medienlink bleibt gesperrt. Erfassen Sie die geschützten Einwilligungsreferenzen aller sichtbaren Personen und bestätigen Sie die vier Medienprüfungen. Interne Asset-IDs oder Prüfsummen müssen Sie nicht selbst erzeugen oder eingeben.
+
+### 6. Als Entwurf an Postiz übergeben
+
+Ein freigegebener Inhalt erscheint weiterhin unter **Freigaben** mit dem Status
+„Bereit zur Planung“. Öffnen Sie ihn und wählen Sie **In Postiz als Entwurf
+übergeben**.
+
+Lesen Sie vor dem Klick den angezeigten Modus:
+
+- **Nur Vorbereitung:** Das System prüft und protokolliert die Übergabe, ändert
+  Postiz aber nicht.
+- **Externe Entwurfsübergabe bereit:** Der technische Dienst hat externe
+  Schreibvorgänge, den passenden Postiz-Kanal und den geprüften Vertrag
+  bestätigt. Markieren Sie die sichtbare Bestätigung bewusst. Auch dann wird
+  nur ein Postiz-Entwurf erstellt.
+
+Der Zielkanal wird über die hinterlegte Postiz-Integration bestimmt. Ändern Sie
+diese technische Zuordnung nicht selbst. Wenn ein geprüftes Bild oder Video
+zum Inhalt gehört, wird ausschließlich die zuvor bestätigte Postiz-Medienreferenz
+an den Entwurf gebunden. Öffnen Sie den Entwurf in Postiz und prüfen Sie
+Zuschnitt, Ton, Untertitel und Einwilligungen erneut. Inhalte, die ein Visual
+benötigen, dürfen ohne dieses geprüfte Medium nicht terminiert oder
+veröffentlicht werden.
+
+Im **Übergabeprotokoll** bedeuten die wichtigsten Zustände:
+
+- **Vorbereitet:** keine externe Änderung;
+- **Übergeben:** Postiz hat den Entwurfsaufruf bestätigt;
+- **Ausgang unklar:** nicht erneut senden; zuerst **Status mit Postiz
+  abgleichen** wählen;
+- **Bestätigt:** der read-only Abgleich hat genau einen Postiz-Datensatz und
+  seine Anbieter-ID gefunden.
+
+Der Abgleich liest Postiz und sendet den Inhalt nicht erneut. Ein bestätigter
+Postiz-Entwurf ist noch keine Veröffentlichung. Erst eine von Postiz bestätigte
+Veröffentlichung startet die Messfenster.
+
+## Ergebnisse richtig lesen
+
+Unter **Ergebnisse** sollen qualifizierte Reaktionen, Leads, Gespräche und nächste Maßnahmen die Entscheidung bestimmen — nicht nur Reichweite oder Likes.
+
+Die automatische Plattform-Metrikaufnahme ist derzeit noch nicht vollständig angeschlossen. Unter **Heute messen** sehen Sie nur Aufgaben für Inhalte, deren Veröffentlichung der Anbieter bestätigt hat und deren Messfenster fällig ist. Deshalb gilt:
+
+- Erfinden oder schätzen Sie keine Werte.
+- Behandeln Sie fehlende Metriken als „noch nicht importiert“, nicht als null Erfolg.
+- Verifizieren Sie Werte vor einer Budget-, Stopp- oder Skalierungsentscheidung in der jeweiligen Plattform.
+- Dokumentieren Sie die Quelle und den Messzeitraum jeder manuellen Bewertung.
+
+Die n8n-Jobs markieren fällige Prüfungen nach 72 Stunden, 7 Tagen, 14 Tagen und 30 Tagen. Sie ersetzen noch keine vollständige Analytics-Integration.
+
+Wählen Sie bei einer fälligen Aufgabe **Messwerte eintragen**. Übertragen Sie
+die Zählwerte aus einem überprüfbaren Plattformexport oder Bericht. Zusätzlich
+sind erforderlich:
+
+- Referenz auf Export oder Bericht,
+- Beginn und Ende des Messzeitraums,
+- Zeitpunkt des Abrufs,
+- Name der eintragenden Person und
+- die verwendete Zuordnungsregel, zum Beispiel „letzter Kampagnenkontakt vor
+  Lead-Erfassung“.
+
+Aktivieren Sie für jede verwendete Kennzahlengruppe den passenden Quellenbeleg
+und wählen Sie die konkrete Exportdatei aus. Die Datei bleibt auf Ihrem Gerät;
+die Konsole erzeugt den unveränderlichen Dateinachweis automatisch. Das System prüft unter anderem, dass qualifizierte Leads nicht höher
+als alle Leads sind, Gespräche nicht höher als qualifizierte Leads und
+Landingpage-Abschlüsse nicht höher als Besuche. Es lehnt zu frühe Messfenster,
+unveröffentlichte Inhalte und widersprüchliche Wiederholungen ab. Eine
+Entscheidung wird nur angezeigt, wenn der Server auch die Datenherkunft
+bestätigt.
+
+## Arbeitsfähigkeit verständlich prüfen
+
+Unter **Arbeitsfähigkeit** sehen Sie nur fünf fachliche Möglichkeiten: Recherche, Ideen & Texte, Medien, Freigabe und Redaktionsplanung. Jede Karte zeigt **Bereit**, **Prüfung offen** oder **Gesperrt** und erklärt den nächsten sinnvollen Schritt in Geschäftssprache. Server-, Modell-, Workflow- oder Netzwerkdetails übernimmt die technische Betreuung.
+
+Die Leiste über der Anwendung stoppt neue Erstellung standardmäßig, solange die sichere Arbeitsfähigkeit nicht vollständig bestätigt ist. Bestehende Entwürfe, Quellen und Ergebnisse bleiben dabei lesbar. Setzen Sie keinen Status selbst auf „fertig“ und umgehen Sie keine gesperrte Schaltfläche.
+
+## Häufige Blocker
+
+- **Keine verifizierten Quellen:** Suchbegriff oder Zeitraum anpassen und neu recherchieren. Keine aktuelle Behauptung daraus erstellen.
+- **Quellen behandeln nur ähnliche, aber nicht dieselbe Aussage:** Die Weiterleitung bleibt gesperrt. Starten Sie eine neue Recherche; zählen Sie einen nur allgemein passenden Artikel nicht als Bestätigung.
+- **Nur eine Domain oder kein aktuelles Datum:** Ergebnis bleibt gesperrt.
+- **Keine Richtung ausgewählt:** Eine der vier Richtungen ausdrücklich auswählen.
+- **Nur sichere Arbeitsvorlage statt KI-Entwurf:** Diese Vorlage ist nicht freigabefähig. Erstellen Sie nach Wiederherstellung der Arbeitsfähigkeit eine neue Version mit der lokalen KI.
+- **Markenfit unter 90 oder eine Prüfung fehlt:** Überarbeitung anfordern.
+- **Trendquelle ist später nicht mehr verfügbar:** Recherche erneuern; gespeicherte Herkunft nicht überschreiben.
+- **Entwurf ist bereits abschließend geprüft:** Nicht überschreiben. Für Änderungen eine versionierte Revision anlegen.
+- **Metriken fehlen:** Plattformdaten nachtragen oder Integration reparieren; keine Nullwerte erfinden.
+- **Publishing-/CRM-Status ist nur „prepared“:** Der Datensatz wurde vorbereitet, aber nicht extern geschrieben.
+- **Postiz-Ausgang ist unklar:** Nicht erneut übergeben. „Status mit Postiz abgleichen“ nutzen und bei keinem eindeutigen Treffer die technische Person informieren.
+- **Instagram-Entwurf enthält kein Medium:** Das freigegebene Bild oder Video in Postiz anhängen und dort erneut prüfen; nicht ohne Medium veröffentlichen.
+
+## Was das System bewusst nicht automatisch macht
+
+- keine Veröffentlichung auf LinkedIn, Instagram oder TikTok,
+- keine externe Postiz-, Twenty- oder Mautic-Schreiboperation ohne explizite Aktivierung,
+- keinen blinden Wiederholungsversuch nach einem unklaren externen Ausgang,
+- keine Freigabe ohne benannte menschliche Prüfung,
+- keine Verwendung eines unbestätigten Trends als aktuelle Tatsache und
+- keine automatische Geschäftsentscheidung aus unvollständigen Analytics-Daten.
+
+Der einfache Merksatz lautet: **Quelle öffnen, Richtung bewusst wählen, KI-Entwurf menschlich prüfen, erst danach außerhalb des Systems veröffentlichen.**

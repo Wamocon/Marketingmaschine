@@ -1,10 +1,20 @@
 # Runtime and private environment files
 runtime-data/
+candidate-runtime-data/
+.env*
+!.env.example
+!deploy/n8n/.env.migration.example
+deploy/n8n/secrets/
+deploy/secrets/
+deploy/n8n/migration/
 deploy/*.generated.env
+config/integrations.local.env
 *.pyc
 __pycache__/
 node_modules/
 test-results/
+.runtime-lock-check/
 
 # Local QA artifacts
 qa_output/
+artifacts/

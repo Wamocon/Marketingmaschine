@@ -21,6 +21,11 @@ class EvidenceVaultTests(unittest.TestCase):
         )
 
         self.assertEqual(errors, [])
+        record = vault.records_for(["Kampagnen/kampagne_1_consulting_qa.json"])[0]
+        self.assertEqual(record["vault_version"], "2026-07-01")
+        self.assertEqual(record["owner"], "WAMOCON Marketing")
+        self.assertEqual(record["source_type"], "internal_campaign_brief")
+        self.assertEqual(record["source_ref"], record["id"])
 
     def test_unapproved_or_unconsented_sources_are_blocked(self):
         vault = EvidenceVault(

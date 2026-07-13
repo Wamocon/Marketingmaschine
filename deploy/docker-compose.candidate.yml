@@ -1,0 +1,68 @@
+name: wamocon-marketing-candidate
+
+services:
+  wmc-marketing-candidate:
+    build:
+      context: ..
+      dockerfile: Dockerfile
+    image: ${MARKETING_MACHINE_CANDIDATE_IMAGE:-wamocon-marketing-machine:candidate}
+    container_name: wmc-marketing-candidate
+    restart: "no"
+    environment:
+      MARKETING_MACHINE_DATA_DIR: /data
+      MARKETING_MACHINE_INSTANCE_MODE: isolated-candidate
+      MARKETING_MACHINE_DATA_NAMESPACE: ${MARKETING_MACHINE_CANDIDATE_NAMESPACE:-candidate-local-validation}
+      MARKETING_MACHINE_DISPOSABLE_DATA: "true"
+      MARKETING_MACHINE_MUTATION_AUTH_MODE: required
+      MARKETING_MACHINE_MUTATION_TOKEN_FILE: /run/secrets/candidate_mutation_token
+      MARKETING_MACHINE_ACTOR_AUTH_MODE: required
+      MARKETING_MACHINE_EDGE_ATTESTATION_FILE: /run/secrets/candidate_edge_attestation
+      MARKETING_MACHINE_ENABLE_EXTERNAL_WRITES: "false"
+      MARKETING_MACHINE_N8N_WORKFLOWS_VERIFIED: "false"
+      MARKETING_MACHINE_REQUIRE_EXPLICIT_CONTENT_MODE: "true"
+      MARKETING_MACHINE_AI_ENABLED: ${MARKETING_MACHINE_AI_ENABLED:-true}
+      MARKETING_MACHINE_ALLOW_CLOUD_FALLBACK: "false"
+      LOCAL_OPENAI_BASE_URL: ${LOCAL_OPENAI_BASE_URL:-http://host.docker.internal:11434/v1}
+      LOCAL_OPENAI_API_KEY: ${LOCAL_OPENAI_API_KEY:-ollama}
+      LOCAL_OPENAI_MODEL_NAME: ${LOCAL_OPENAI_MODEL_NAME:-}
+      LOCAL_MODEL_NAME: ${LOCAL_MODEL_NAME:-qwen3.6:35b}
+      OLLAMA_BASE_URL: ${OLLAMA_BASE_URL:-http://host.docker.internal:11434}
+      SEARXNG_BASE_URL: ${SEARXNG_BASE_URL:-http://host.docker.internal:8090}
+      FIRECRAWL_BASE_URL: ${FIRECRAWL_BASE_URL:-https://api.firecrawl.dev/v2}
+      FIRECRAWL_API_KEY: ${FIRECRAWL_API_KEY:-}
+      FIRECRAWL_ALLOW_UNAUTHENTICATED_SELF_HOSTED: ${FIRECRAWL_ALLOW_UNAUTHENTICATED_SELF_HOSTED:-false}
+      POSTIZ_MEDIA_ORIGIN: ${POSTIZ_MEDIA_ORIGIN:-http://127.0.0.1:5000}
+      POSTIZ_BASE_URL: ${POSTIZ_BASE_URL:-http://host.docker.internal:4007}
+      POSTIZ_CONTRACT_VERIFIED: "false"
+      TWENTY_BASE_URL: ${TWENTY_BASE_URL:-http://host.docker.internal:4019}
+      TWENTY_CONTRACT_VERIFIED: "false"
+      MAUTIC_BASE_URL: ${MAUTIC_BASE_URL:-http://host.docker.internal:4020}
+      MAUTIC_CONTRACT_VERIFIED: "false"
+      COMFYUI_BASE_URL: ${COMFYUI_BASE_URL:-http://host.docker.internal:8188}
+      QDRANT_BASE_URL: ${QDRANT_BASE_URL:-http://host.docker.internal:6333}
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    volumes:
+      - candidate_runtime:/data
+    tmpfs:
+      - /run/wamocon-agent-secrets:rw,noexec,nosuid,nodev,size=1m,mode=0700
+    secrets:
+      - candidate_mutation_token
+      - candidate_edge_attestation
+    ports:
+      - "127.0.0.1:${MARKETING_MACHINE_CANDIDATE_PORT:-18118}:8080"
+    security_opt:
+      - no-new-privileges:true
+    labels:
+      - "com.wamocon.core.app=marketing-machine-candidate"
+      - "com.wamocon.core.disposable=true"
+
+secrets:
+  candidate_mutation_token:
+    file: ./secrets/candidate_mutation_token
+  candidate_edge_attestation:
+    file: ./secrets/candidate_edge_attestation
+
+volumes:
+  candidate_runtime:
+    name: wamocon_marketing_candidate_validation_data

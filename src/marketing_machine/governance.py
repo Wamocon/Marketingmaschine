@@ -60,7 +60,10 @@ class GovernancePolicy:
     def check_content(self, text: str) -> GovernanceDecision:
         for pattern in self.blocked_patterns:
             if re.search(pattern, text or "", re.IGNORECASE):
-                return GovernanceDecision(PolicyAction.DENY, f"blocked content pattern matched: {pattern}")
+                return GovernanceDecision(
+                    PolicyAction.DENY,
+                    "content safety policy requires a new draft",
+                )
         return GovernanceDecision(PolicyAction.ALLOW, "allowed")
 
     def check_brief(self, brief: ContentBrief) -> GovernanceDecision:

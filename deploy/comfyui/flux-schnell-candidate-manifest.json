@@ -1,0 +1,121 @@
+{
+  "version": "2026-07-13",
+  "scope": "isolated-candidate-only",
+  "purpose": "Pinned, reversible FLUX.1-schnell qualification bundle for the WAMOCON creative preflight.",
+  "production_guard": {
+    "forbidden_roots": [
+      "/home/wamocon/ComfyUI",
+      "/home/wamocon/comfyui"
+    ],
+    "candidate_root": "/home/wamocon/candidates/comfyui-flux-schnell-20260710/src",
+    "candidate_bind": "127.0.0.1",
+    "candidate_port": 18189,
+    "allow_model_symlinks_to_production": false,
+    "allow_custom_nodes": false,
+    "allow_production_service_restart": false
+  },
+  "runtime": {
+    "repository": "https://github.com/Comfy-Org/ComfyUI.git",
+    "commit": "bd39bbf0678ebd31c972fd365733a8c729f2cd74",
+    "reported_comfyui_version": "0.25.0",
+    "python_version": "3.12.13",
+    "torch_build": "2.11.0+cu130",
+    "core_loader_node": "UNETLoader",
+    "text_loader_node": "DualCLIPLoader",
+    "vae_loader_node": "VAELoader",
+    "required_packages": {
+      "comfyui-frontend-package": "1.45.15",
+      "comfyui-workflow-templates": "0.10.0",
+      "comfyui-embedded-docs": "0.5.4",
+      "comfy-kitchen": "0.2.10",
+      "comfy-aimdo": "0.4.10"
+    }
+  },
+  "model_bundle": {
+    "license": "Apache-2.0 source evidence recorded; named final review required",
+    "license_review_required": true,
+    "expected_total_bytes": 29257890132,
+    "minimum_free_bytes_before_download": 64424509440,
+    "files": [
+      {
+        "path": "models/diffusion_models/flux1-schnell.safetensors",
+        "bytes": 23782506688,
+        "sha256": "9403429e0052277ac2a87ad800adece5481eecefd9ed334e1f348723621d2a0a",
+        "xet_hash": "df5d997365ef3f1e30100e6ce56e0c4e1dcc34e7caa59d1cf46aa61bb8b048d7",
+        "source_repo": "Comfy-Org/flux1-schnell",
+        "source_revision": "7d679837b018bfeb28eca55734b335efcd0e7100",
+        "source_file": "flux1-schnell.safetensors",
+        "gated_source": false,
+        "source_license": "Apache-2.0",
+        "integrity_status": "actual file SHA-256 pinned from immutable source metadata; Xet CAS hash is informational only; candidate bytes rehashed during qualification"
+      },
+      {
+        "path": "models/text_encoders/clip_l.safetensors",
+        "bytes": 246144152,
+        "sha256": "660c6f5b1abae9dc498ac2d21e1347d2abdb0cf6c0c0c8576cd796491d9a6cdd",
+        "xet_hash": "645ba23540a1ce97d9c44332759ded7c2b5b8449914b8890eefd73d88e6e0229",
+        "source_repo": "comfyanonymous/flux_text_encoders",
+        "source_revision": "6af2a98e3f615bdfa612fbd85da93d1ed5f69ef5",
+        "source_file": "clip_l.safetensors",
+        "gated_source": false,
+        "source_license": "Apache-2.0",
+        "integrity_status": "actual file SHA-256 pinned from immutable source metadata; Xet CAS hash is informational only; candidate bytes rehashed during qualification"
+      },
+      {
+        "path": "models/text_encoders/t5xxl_fp8_e4m3fn.safetensors",
+        "bytes": 4893934904,
+        "sha256": "7d330da4816157540d6bb7838bf63a0f02f573fc48ca4d8de34bb0cbfd514f09",
+        "xet_hash": "ca49b49b9b4ef106396a18f76600a52b6a07cd1322408c83337483ce56b803ba",
+        "source_repo": "comfyanonymous/flux_text_encoders",
+        "source_revision": "6af2a98e3f615bdfa612fbd85da93d1ed5f69ef5",
+        "source_file": "t5xxl_fp8_e4m3fn.safetensors",
+        "gated_source": false,
+        "source_license": "Apache-2.0",
+        "integrity_status": "actual file SHA-256 pinned from immutable source metadata; Xet CAS hash is informational only; candidate bytes rehashed during qualification"
+      },
+      {
+        "path": "models/vae/ae.safetensors",
+        "bytes": 335304388,
+        "sha256": "afc8e28272cd15db3919bacdb6918ce9c1ed22e96cb12c4d5ed0fba823529e38",
+        "xet_hash": "f73eecf7c469ff442523dc712cc161d631df071bf4d9d793494fbf00cdd80a82",
+        "source_repo": "Comfy-Org/Lumina_Image_2.0_Repackaged",
+        "source_revision": "22e393d707f2d13e736b1a461c958644258cd9d9",
+        "source_file": "split_files/vae/ae.safetensors",
+        "gated_source": false,
+        "source_license": "Apache-2.0 by exact byte identity with the pinned official FLUX.1-schnell source",
+        "upstream_provenance": {
+          "official_repo": "black-forest-labs/FLUX.1-schnell",
+          "official_revision": "741f7c3ce8b383c54771c7003378a50191e9efe9",
+          "official_file": "ae.safetensors",
+          "official_sha256": "afc8e28272cd15db3919bacdb6918ce9c1ed22e96cb12c4d5ed0fba823529e38",
+          "official_bytes": 335304388,
+          "official_license": "apache-2.0",
+          "official_repository_is_gated": true,
+          "evidence_checked_at": "2026-07-13"
+        },
+        "integrity_status": "mirror bytes match the pinned official FLUX.1-schnell file SHA-256 and size; Xet CAS hash is informational only; candidate bytes rehashed during qualification"
+      }
+    ]
+  },
+  "readiness": {
+    "package_mismatches_must_be_empty": true,
+    "recognized_model": "flux1-schnell.safetensors",
+    "recognized_text_encoders": [
+      "t5xxl_fp8_e4m3fn.safetensors",
+      "clip_l.safetensors"
+    ],
+    "dual_clip_loader_positions": {
+      "clip_name1": "t5xxl_fp8_e4m3fn.safetensors",
+      "clip_name2": "clip_l.safetensors"
+    },
+    "validated_vae": "ae.safetensors",
+    "workflow_qualification": "history-verified-evidence-required",
+    "workflow_file": "deploy/comfyui/flux-schnell-qualification-api.json",
+    "workflow_sha256": "10a93745478a805b01c36827c9168bc995098fcba460b9dc8fd0dadabe6efe76",
+    "output_prefix": "wamocon_qualification_flux1_schnell_v1",
+    "history_max_age_seconds": 86400,
+    "output_bytes_and_sha256_required": true,
+    "human_visual_approval_required": true,
+    "automated_visual_approval_allowed": false
+  }
+}

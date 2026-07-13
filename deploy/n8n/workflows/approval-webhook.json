@@ -1,53 +1,15 @@
 {
-  "name": "WAMOCON Marketing - Human Approval",
-  "active": true,
-  "nodes": [
-    {
-      "parameters": {
-        "httpMethod": "POST",
-        "path": "wamocon-marketing/approve-content",
-        "responseMode": "responseNode"
-      },
-      "id": "approval-webhook",
-      "name": "Approval Webhook",
-      "type": "n8n-nodes-base.webhook",
-      "typeVersion": 2,
-      "position": [240, 300],
-      "webhookId": "wamocon-marketing-approve-content"
-    },
-    {
-      "parameters": {
-        "method": "POST",
-        "url": "http://wmc-marketing-agent:8080/workflows/approve-content",
-        "sendBody": true,
-        "specifyBody": "json",
-        "jsonBody": "={{ $json.body }}"
-      },
-      "id": "approve-content",
-      "name": "Apply Human Approval",
-      "type": "n8n-nodes-base.httpRequest",
-      "typeVersion": 4,
-      "position": [520, 300]
-    },
-    {
-      "parameters": {
-        "respondWith": "json",
-        "responseBody": "={{ $json }}"
-      },
-      "id": "respond",
-      "name": "Return Approval Result",
-      "type": "n8n-nodes-base.respondToWebhook",
-      "typeVersion": 1,
-      "position": [800, 300]
-    }
-  ],
-  "connections": {
-    "Approval Webhook": {
-      "main": [[{"node": "Apply Human Approval", "type": "main", "index": 0}]]
-    },
-    "Apply Human Approval": {
-      "main": [[{"node": "Return Approval Result", "type": "main", "index": 0}]]
-    }
+  "id": "5OzpL9oBMR8gpSJA",
+  "name": "WAMOCON Marketing - Human Approval (Retired: use authenticated console)",
+  "active": false,
+  "nodes": [],
+  "connections": {},
+  "settings": {
+    "executionOrder": "v1"
   },
-  "settings": {"executionOrder": "v1"}
+  "meta": {
+    "retired_reason": "A shared webhook credential cannot prove which person approved content.",
+    "replacement": "Use the TLS-protected marketing console with a named edge-authenticated operator account.",
+    "must_not_activate": true
+  }
 }

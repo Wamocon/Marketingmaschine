@@ -1,0 +1,38 @@
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
+rule_files:
+  - /etc/prometheus/rules/*.yml
+
+scrape_configs:
+  - job_name: wamocon-marketing-machine
+    metrics_path: /metrics
+    scrape_timeout: 10s
+    static_configs:
+      - targets: ["wmc-marketing-agent:8080"]
+        labels:
+          product: wamocon-marketing-machine
+          environment: production
+
+  # Becomes healthy after N8N_METRICS=true is enabled during the staged
+  # SQLite-to-Postgres release. Until then it is an intentional visible gap.
+  - job_name: core-n8n
+    metrics_path: /metrics
+    scrape_timeout: 10s
+    static_configs:
+      - targets: ["core-n8n:5678"]
+        labels:
+          product: core-automation
+          environment: production
+
+  # Preserve the two legacy targets while their owning projects are reviewed.
+  - job_name: stars-fastapi
+    metrics_path: /metrics
+    static_configs:
+      - targets: ["host.docker.internal:8000"]
+
+  - job_name: triton
+    metrics_path: /metrics
+    static_configs:
+      - targets: ["host.docker.internal:8202"]

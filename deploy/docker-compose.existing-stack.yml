@@ -3,10 +3,14 @@ services:
     build:
       context: ..
       dockerfile: Dockerfile
+    image: ${MARKETING_MACHINE_IMAGE:-wamocon-marketing-machine:production}
     container_name: wmc-marketing-agent
     restart: unless-stopped
     environment:
       MARKETING_MACHINE_DATA_DIR: /data
+      MARKETING_MACHINE_INSTANCE_MODE: production
+      MARKETING_MACHINE_DATA_NAMESPACE: production-nvidia1
+      MARKETING_MACHINE_DISPOSABLE_DATA: "false"
       N8N_BASE_URL: http://core-n8n:5678
       COMFYUI_BASE_URL: ${COMFYUI_BASE_URL:-http://host.docker.internal:8188}
       OLLAMA_BASE_URL: ${OLLAMA_BASE_URL:-http://host.docker.internal:11434}
@@ -14,6 +18,16 @@ services:
       LOCAL_OPENAI_API_KEY: ${LOCAL_OPENAI_API_KEY:-ollama}
       LOCAL_OPENAI_MODEL_NAME: ${LOCAL_OPENAI_MODEL_NAME:-}
       LOCAL_MODEL_NAME: ${LOCAL_MODEL_NAME:-qwen3.6:35b}
+      MARKETING_MACHINE_AI_ENABLED: ${MARKETING_MACHINE_AI_ENABLED:-true}
+      MARKETING_MACHINE_ALLOW_CLOUD_FALLBACK: ${MARKETING_MACHINE_ALLOW_CLOUD_FALLBACK:-false}
+      MARKETING_MACHINE_MODEL_TIMEOUT_SECONDS: ${MARKETING_MACHINE_MODEL_TIMEOUT_SECONDS:-90}
+      MARKETING_MACHINE_MODEL_RETRIES: ${MARKETING_MACHINE_MODEL_RETRIES:-1}
+      MARKETING_MACHINE_REQUIRE_EXPLICIT_CONTENT_MODE: ${MARKETING_MACHINE_REQUIRE_EXPLICIT_CONTENT_MODE:-true}
+      MARKETING_MACHINE_N8N_WORKFLOWS_VERIFIED: ${MARKETING_MACHINE_N8N_WORKFLOWS_VERIFIED:-false}
+      MARKETING_MACHINE_MUTATION_TOKEN_FILE: /run/secrets/marketing_mutation_token
+      MARKETING_MACHINE_MUTATION_AUTH_MODE: ${MARKETING_MACHINE_MUTATION_AUTH_MODE:-required}
+      MARKETING_MACHINE_ACTOR_AUTH_MODE: required
+      MARKETING_MACHINE_EDGE_ATTESTATION_FILE: /run/secrets/marketing_edge_attestation
       CLOUD_OPENAI_BASE_URL: ${CLOUD_OPENAI_BASE_URL:-}
       CLOUD_OPENAI_API_KEY: ${CLOUD_OPENAI_API_KEY:-}
       CLOUD_MODEL_NAME: ${CLOUD_MODEL_NAME:-}
@@ -22,15 +36,34 @@ services:
       KIMI_MODEL_NAME: ${KIMI_MODEL_NAME:-}
       MARKETING_MACHINE_ENABLE_EXTERNAL_WRITES: ${MARKETING_MACHINE_ENABLE_EXTERNAL_WRITES:-false}
       POSTIZ_CREATE_DRAFT_PATH: ${POSTIZ_CREATE_DRAFT_PATH:-}
+      POSTIZ_LIST_POSTS_PATH: ${POSTIZ_LIST_POSTS_PATH:-/api/public/v1/posts}
       POSTIZ_API_KEY: ${POSTIZ_API_KEY:-}
+      POSTIZ_CONTRACT_VERIFIED: ${POSTIZ_CONTRACT_VERIFIED:-false}
+      POSTIZ_LINKEDIN_INTEGRATION_ID: ${POSTIZ_LINKEDIN_INTEGRATION_ID:-}
+      POSTIZ_LINKEDIN_PROVIDER_TYPE: ${POSTIZ_LINKEDIN_PROVIDER_TYPE:-linkedin}
+      POSTIZ_INSTAGRAM_INTEGRATION_ID: ${POSTIZ_INSTAGRAM_INTEGRATION_ID:-}
+      POSTIZ_INSTAGRAM_PROVIDER_TYPE: ${POSTIZ_INSTAGRAM_PROVIDER_TYPE:-instagram}
+      POSTIZ_MEDIA_ORIGIN: ${POSTIZ_MEDIA_ORIGIN:-}
       TWENTY_CREATE_CONTACT_PATH: ${TWENTY_CREATE_CONTACT_PATH:-}
       TWENTY_API_KEY: ${TWENTY_API_KEY:-}
+      TWENTY_CONTRACT_VERIFIED: ${TWENTY_CONTRACT_VERIFIED:-false}
       MAUTIC_CREATE_CONTACT_PATH: ${MAUTIC_CREATE_CONTACT_PATH:-}
       MAUTIC_API_KEY: ${MAUTIC_API_KEY:-}
+      MAUTIC_CONTRACT_VERIFIED: ${MAUTIC_CONTRACT_VERIFIED:-false}
       LITELLM_BASE_URL: http://host.docker.internal:4000
       OPA_BASE_URL: http://host.docker.internal:8181
-      SEARXNG_BASE_URL: http://host.docker.internal:8090
-      QDRANT_BASE_URL: http://host.docker.internal:6333
+      SEARXNG_BASE_URL: ${SEARXNG_BASE_URL:-http://host.docker.internal:8090}
+      FIRECRAWL_BASE_URL: ${FIRECRAWL_BASE_URL:-https://api.firecrawl.dev/v2}
+      FIRECRAWL_API_KEY: ${FIRECRAWL_API_KEY:-}
+      FIRECRAWL_ALLOW_UNAUTHENTICATED_SELF_HOSTED: ${FIRECRAWL_ALLOW_UNAUTHENTICATED_SELF_HOSTED:-false}
+      GOOGLE_CSE_API_KEY: ${GOOGLE_CSE_API_KEY:-}
+      GOOGLE_CSE_ID: ${GOOGLE_CSE_ID:-}
+      REDDIT_BEARER_TOKEN: ${REDDIT_BEARER_TOKEN:-}
+      REDDIT_USER_AGENT: ${REDDIT_USER_AGENT:-wamocon-marketing-machine/0.2}
+      TIKTOK_RESEARCH_CLIENT_TOKEN: ${TIKTOK_RESEARCH_CLIENT_TOKEN:-}
+      INSTAGRAM_ACCESS_TOKEN: ${INSTAGRAM_ACCESS_TOKEN:-}
+      INSTAGRAM_BUSINESS_ACCOUNT_ID: ${INSTAGRAM_BUSINESS_ACCOUNT_ID:-}
+      QDRANT_BASE_URL: ${QDRANT_BASE_URL:-http://core-qdrant:6333}
       PROMETHEUS_BASE_URL: http://host.docker.internal:9091
       GRAFANA_BASE_URL: http://host.docker.internal:3030
       POSTIZ_BASE_URL: http://wmc-postiz:5000
@@ -40,11 +73,31 @@ services:
       - "host.docker.internal:host-gateway"
     volumes:
       - ../runtime-data:/data
+    tmpfs:
+      - /run/wamocon-agent-secrets:rw,noexec,nosuid,nodev,size=1m,mode=0700
+    secrets:
+      - marketing_mutation_token
+      - marketing_edge_attestation
     ports:
       - "127.0.0.1:8117:8080"
     networks:
       - core-net
+      - shared-network
+    security_opt:
+      - no-new-privileges:true
+    labels:
+      - "com.wamocon.core.layer=3"
+      - "com.wamocon.core.app=marketing-machine"
+      - "com.wamocon.core.description=Governed five-campaign marketing control room"
 
 networks:
   core-net:
     external: true
+  shared-network:
+    external: true
+
+secrets:
+  marketing_mutation_token:
+    file: ./secrets/marketing_mutation_token
+  marketing_edge_attestation:
+    file: ./secrets/marketing_edge_attestation
