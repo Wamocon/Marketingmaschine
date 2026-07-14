@@ -120,9 +120,12 @@ Docker Scout result exists. Do not relabel the older image digests, SBOMs, or
 
 ### Final local worktree gate
 
-The current worktree is an uncommitted candidate based on
-`a7b823b85629c27febf16e9428874297a50b39b8`; it is not the source currently
-running in production. Its final local gate produced the following evidence:
+The source candidate validated here was an uncommitted worktree based on
+`a7b823b85629c27febf16e9428874297a50b39b8`. After this gate, the operator
+explicitly authorized a source-only publication: the candidate was committed
+as `32c372d7bcadb28cd5a4453a416142d38f24e125` and merged with canonical
+`main`. It is still not the source running in production. Its final local gate
+produced the following evidence:
 
 - Python 3.12.13 loaded 57 compatible packages. Source compilation, Ruff, and
   mypy all passed; mypy checked 44 source files.
@@ -149,9 +152,10 @@ running in production. Its final local gate produced the following evidence:
 - The local Docker Desktop Linux engine timed out during its final server
   probe. Compose rendering is green, but there is no truthful final container
   build, image digest, SBOM, or container smoke result for this exact tree.
-- GitHub still has no published workflow, ruleset, or branch protection for
-  `main`. Because the live production gate is RED, this candidate was not
-  committed or pushed as a release-ready mainline change.
+- At validation time GitHub had no published workflow, ruleset, or branch
+  protection for `main`. The later source-only publication made the local CI
+  workflow available on `main`; it did not add a ruleset or branch protection
+  and must not be interpreted as production approval while this report is RED.
 
 The release archive, checksum, and inventories are generated outside the
 source tree. Their sidecars are the authoritative artifact identities; an
