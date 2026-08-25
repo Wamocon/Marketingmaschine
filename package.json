@@ -5,7 +5,7 @@
     "smoke:trend-studio": "node scripts/trend_studio_user_flow_smoke.js"
   },
   "devDependencies": {
-    "@axe-core/playwright": "4.12.1",
-    "playwright": "1.61.1"
+    "@axe-core/playwright": "4.13.0",
+    "playwright": "1.62.1"
   }
 }
